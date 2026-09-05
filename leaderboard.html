@@ -1,0 +1,21 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>公開成績｜晨達現場幹部培訓</title><style>
+:root{--navy:#1f3e63;--navy2:#173454;--orange:#f39a14;--bg:#f4f7fa;--card:#fff;--line:#dbe3ec;--text:#1f2937;--muted:#6b7280;--good:#2f855a;--bad:#c53030}
+*{box-sizing:border-box} body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;background:var(--bg);color:var(--text)}
+.topbar{height:14px;background:var(--navy)} .wrap{max-width:1040px;margin:auto;padding:24px 18px 42px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 24px rgba(31,62,99,.08);padding:28px}
+h1,h2,h3{color:var(--navy)} h1{margin:0;font-size:32px}.sub{margin-top:8px;color:var(--muted)}
+.hero{display:flex;justify-content:space-between;gap:20px;align-items:center}.badge{background:var(--orange);color:#fff;font-weight:700;padding:10px 16px;border-radius:14px}
+.btn{border:none;border-radius:12px;padding:12px 20px;font-size:17px;font-weight:700;cursor:pointer}.primary{background:var(--navy);color:#fff}.secondary{background:#eef3f8;color:var(--navy)}
+input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:10px;font-size:16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.choice{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0;font-size:17px;cursor:pointer}
+.choice.selected{border:2px solid var(--navy);background:#edf4fb}.progress{height:10px;background:#e7edf4;border-radius:999px;overflow:hidden}.progress>div{height:100%;background:var(--orange)}
+.pill{display:inline-block;background:#eef3f8;color:var(--navy);border-radius:999px;padding:8px 12px;font-weight:700;margin:4px}
+.hidden{display:none}.nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px}.score{font-size:64px;font-weight:900;color:var(--navy)}
+table{width:100%;border-collapse:collapse}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--navy)}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}.metric b{display:block;font-size:28px;color:var(--navy)}
+.bar{height:12px;background:#e7edf4;border-radius:999px;overflow:hidden}.bar span{display:block;height:100%;background:var(--orange)}
+.note{color:var(--muted);font-size:13px;line-height:1.6}.error{color:var(--bad);font-weight:700}.good{color:var(--good);font-weight:700}
+@media(max-width:720px){.hero{align-items:flex-start;flex-direction:column}.grid2,.metric-grid{grid-template-columns:1fr}.nav{flex-direction:column}.btn{width:100%}h1{font-size:26px}}
+</style></head><body><div class="topbar"></div><div class="wrap"><div class="card"><div class="hero"><div><h1>公開成績</h1><div class="sub">僅顯示同意公開之作答者；Email 永不公開</div></div><a class="btn secondary" href="index.html" style="text-decoration:none">返回測驗</a></div><div id="status" class="note" style="margin:18px 0"></div><table><thead><tr><th>排名</th><th>代號</th><th>分數</th><th>答對</th><th>日期</th></tr></thead><tbody id="body"></tbody></table></div></div><script>
+const API_URL="https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec"; async function load(){const st=document.getElementById('status');if(!API_URL){st.textContent='尚未設定雲端 API URL。';return}try{const r=await fetch(API_URL+'?action=leaderboard');const d=await r.json();d.rows.forEach((x,i)=>document.getElementById('body').innerHTML+=`<tr><td>${i+1}</td><td>${x.code||'匿名'}</td><td><b>${x.score}</b></td><td>${x.correct}/${x.total}</td><td>${x.date}</td></tr>`);st.textContent=`目前公開 ${d.rows.length} 筆成績`;}catch(e){st.textContent='讀取失敗'}} load();
+</script></body></html>
