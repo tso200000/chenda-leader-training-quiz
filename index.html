@@ -27,26 +27,30 @@
     .gate-note{margin:12px 0 0;color:var(--m);font-size:13px;line-height:1.5}
     .wrap{max-width:1180px;margin:auto;padding:30px 18px 44px}
     .head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
-    .head-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .eyebrow{color:var(--o);font-weight:800;letter-spacing:.08em;font-size:18px}
-    .head h1{margin:8px 0 0;color:var(--n);font-size:42px}
+    .head-actions{display:flex;flex-shrink:0;gap:10px;flex-wrap:wrap}
+    .brand-logo{display:block;width:min(100%,520px);height:auto;object-fit:contain}
+    .head h1{margin:14px 0 0;color:var(--n);font-size:42px}
     .sub{color:var(--m);margin-top:10px;font-size:19px}
-    .admin,.logout{background:#fff;border:1px solid var(--l);color:var(--n);text-decoration:none;padding:12px 16px;border-radius:12px;font-weight:800;box-shadow:0 5px 16px #1f3e6310;font-size:18px}
+    .admin,.logout{background:#fff;border:1px solid var(--l);color:var(--n);text-decoration:none;padding:12px 16px;border-radius:12px;font-weight:800;box-shadow:0 5px 16px #1f3e6310;font-size:18px;white-space:nowrap}
     .logout{color:#8b2c22}
-    .intro{margin:26px 0 22px;background:#fff;border:1px solid var(--l);border-radius:16px;padding:16px 20px;box-shadow:0 6px 20px #1f3e630d;font-size:18px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px}
     .card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:28px;box-shadow:0 10px 28px #1f3e6312}
     .icon{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:#eef3f8}
     .card h2{color:var(--n);font-size:30px;margin:18px 0 8px}
     .card p{color:var(--m);line-height:1.7;font-size:18px}
+    .en-title{display:block;margin-top:5px;color:#53657a;font-size:18px;line-height:1.35}
+    .en-copy{display:block;margin-top:7px;font-size:15px;line-height:1.55}
     .meta{font-weight:800;color:var(--n);margin:18px 0;font-size:18px}
+    .en-meta{display:block;margin-top:5px;color:#53657a;font-size:15px;font-weight:700;line-height:1.45}
     .btn{display:inline-block;text-decoration:none;border-radius:12px;padding:12px 18px;font-weight:800;color:#fff;background:var(--n);font-size:18px}
     .btn.teal{background:var(--t)}
+    .en-button{display:block;margin-top:2px;font-size:14px;font-weight:700}
     .status{margin-top:22px;background:#fff;border:1px solid var(--l);border-radius:16px;padding:15px 18px;display:flex;gap:24px;flex-wrap:wrap;font-size:18px}
+    .status-en{margin-top:5px;color:#53657a;font-size:15px}
     .ok{color:#2f855a;font-weight:800}
     .build{color:#8a6d1d;font-weight:800}
     .foot{margin-top:24px;text-align:right;color:var(--m);font-size:15px}
-    @media(max-width:760px){body{font-size:17px}.head{flex-direction:column}.grid{grid-template-columns:1fr}.head h1{font-size:34px}.head-actions{width:100%}.admin,.logout{font-size:17px}.sub,.card p,.meta,.intro,.status,.btn{font-size:17px}}
+    @media(max-width:760px){body{font-size:17px}.head{flex-direction:column}.grid{grid-template-columns:1fr}.head h1{font-size:34px}.head-actions{width:100%}.admin,.logout{font-size:17px}.sub,.card p,.meta,.status,.btn{font-size:17px}.en-title{font-size:17px}.en-copy,.en-meta,.status-en{font-size:14px}}
     @media(max-width:430px){.gate{padding:24px 16px}.gate-card{padding:34px 20px 28px}.gate-card h1{font-size:29px}.gate-brand{font-size:14px}.gate-subtitle{font-size:11px;letter-spacing:.08em}.gate-form label{font-size:20px}.gate-input{height:58px}.gate-button{min-height:56px}}
   </style>
 </head>
@@ -74,7 +78,7 @@
   <main class="wrap" id="platformHome" hidden>
     <div class="head">
       <div>
-        <div class="eyebrow">CHEN DAR ENTERPRISE</div>
+        <img class="brand-logo" src="assets/chenda-cis-logo.png" alt="晨達企業股份有限公司｜CHEN DAR ENTERPRISE CO., LTD.">
         <h1>晨達線上測驗平台</h1>
         <div class="sub">教育訓練｜能力鑑定｜成績管理</div>
       </div>
@@ -83,7 +87,6 @@
         <button class="logout" id="logoutButton" type="button">退出平台</button>
       </div>
     </div>
-    <div class="intro"><strong>請選擇測驗系統</strong>｜不同測驗依其使用情境採用不同作答流程。</div>
     <section class="grid">
       <article class="card">
         <div class="icon">👥</div>
@@ -94,15 +97,15 @@
       </article>
       <article class="card">
         <div class="icon">🎧</div>
-        <h2>移工中文聽力鑑定</h2>
-        <p>中文聽力能力測驗，包含考生作答、考官控制與成績管理。</p>
-        <div class="meta">50題｜A/B/C/D四版本｜批次同步</div>
-        <a class="btn teal" href="https://script.google.com/macros/s/AKfycbwh57cjiwtEYx0TO11qaJOaaMKGjlfwSbgiDjwBIhsW9o5C6vrMYcOdir_rXnGHlsf3/exec">進入鑑定系統</a>
+        <h2>中文聽力鑑定<span class="en-title" lang="en">Chinese Listening Assessment</span></h2>
+        <p>中文聽力能力測驗，包含考生作答、考官控制與成績管理。<span class="en-copy" lang="en">Chinese listening assessment with student answering, examiner control, and score management.</span></p>
+        <div class="meta">50題｜A/B/C/D四版本｜批次同步<span class="en-meta" lang="en">50 Questions｜Versions A/B/C/D｜Batch Sync</span></div>
+        <a class="btn teal" href="https://script.google.com/macros/s/AKfycbwh57cjiwtEYx0TO11qaJOaaMKGjlfwSbgiDjwBIhsW9o5C6vrMYcOdir_rXnGHlsf3/exec">進入鑑定系統<span class="en-button" lang="en">Enter Assessment</span></a>
       </article>
     </section>
     <div class="status">
       <div>現場幹部培訓：<span class="ok">已上線</span></div>
-      <div>移工中文聽力鑑定：<span class="ok">測試中</span></div>
+      <div>中文聽力鑑定：<span class="ok">測試中</span><div class="status-en" lang="en">Chinese Listening Assessment：<span class="ok">Testing</span></div></div>
     </div>
     <div class="foot">晨達企業｜線上測驗平台　平台版本 V1.0｜更新日期 2026-09-08</div>
   </main>
