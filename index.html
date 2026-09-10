@@ -1,1 +1,229 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>晨達｜線上測驗平台</title><style>:root{--n:#1f3e63;--o:#f39a14;--t:#2a8d8a;--bg:#f4f7fa;--l:#dbe3ec;--m:#6b7280}*{box-sizing:border-box}body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;background:var(--bg);color:#1f2937;font-size:18px}.top{height:14px;background:var(--n)}.wrap{max-width:1180px;margin:auto;padding:30px 18px 44px}.head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.eyebrow{color:var(--o);font-weight:800;letter-spacing:.08em;font-size:18px}.head h1{margin:8px 0 0;color:var(--n);font-size:42px}.sub{color:var(--m);margin-top:10px;font-size:19px}.admin{background:#fff;border:1px solid var(--l);color:var(--n);text-decoration:none;padding:12px 16px;border-radius:12px;font-weight:800;box-shadow:0 5px 16px #1f3e6310;font-size:18px}.intro{margin:26px 0 22px;background:#fff;border:1px solid var(--l);border-radius:16px;padding:16px 20px;box-shadow:0 6px 20px #1f3e630d;font-size:18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:28px;box-shadow:0 10px 28px #1f3e6312}.icon{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:#eef3f8}.card h2{color:var(--n);font-size:30px;margin:18px 0 8px}.card p{color:var(--m);line-height:1.7;font-size:18px}.meta{font-weight:800;color:var(--n);margin:18px 0;font-size:18px}.btn{display:inline-block;text-decoration:none;border-radius:12px;padding:12px 18px;font-weight:800;color:#fff;background:var(--n);font-size:18px}.btn.teal{background:var(--t)}.status{margin-top:22px;background:#fff;border:1px solid var(--l);border-radius:16px;padding:15px 18px;display:flex;gap:24px;flex-wrap:wrap;font-size:18px}.ok{color:#2f855a;font-weight:800}.build{color:#8a6d1d;font-weight:800}.foot{margin-top:24px;text-align:right;color:var(--m);font-size:15px}@media(max-width:760px){body{font-size:17px}.head{flex-direction:column}.grid{grid-template-columns:1fr}.head h1{font-size:34px}.admin{align-self:flex-start}.sub,.card p,.meta,.intro,.status,.btn{font-size:17px}}</style></head><body><div class="top"></div><main class="wrap"><div class="head"><div><div class="eyebrow">CHEN DAR ENTERPRISE</div><h1>晨達線上測驗平台</h1><div class="sub">教育訓練｜能力鑑定｜成績管理</div></div><a class="admin" href="admin.html">⚙ 管理員登入</a></div><div class="intro"><strong>請選擇測驗系統</strong>｜不同測驗依其使用情境採用不同作答流程。</div><section class="grid"><article class="card"><div class="icon">👥</div><h2>現場幹部培訓</h2><p>8堂基礎幹部課程，從會做，走向會帶、會管、會改善。</p><div class="meta">8堂課程｜目前開放第1堂</div><a class="btn" href="leader-training.html">進入培訓中心</a></article><article class="card"><div class="icon">🎧</div><h2>移工中文聽力鑑定</h2><p>中文聽力能力測驗，包含考生作答、考官控制與成績管理。</p><div class="meta">50題｜A/B/C/D四版本｜批次同步</div><a class="btn teal" href="https://script.google.com/macros/s/AKfycbwh57cjiwtEYx0TO11qaJOaaMKGjlfwSbgiDjwBIhsW9o5C6vrMYcOdir_rXnGHlsf3/exec">進入鑑定系統</a></article></section><div class="status"><div>現場幹部培訓：<span class="ok">已上線</span></div><div>移工中文聽力鑑定：<span class="ok">測試中</span></div></div><div class="foot">晨達企業｜線上測驗平台　平台版本 V1.0｜更新日期 2026-09-08</div></main></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>晨達｜線上測驗平台</title>
+  <style>
+    :root{--n:#1f3e63;--o:#f39a14;--t:#2a8d8a;--bg:#f4f7fa;--l:#dbe3ec;--m:#6b7280}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;background:var(--bg);color:#1f2937;font-size:18px}
+    [hidden]{display:none!important}
+    .top{height:14px;background:var(--n)}
+    .gate{min-height:calc(100vh - 14px);display:grid;place-items:center;padding:32px 18px;background:#f5f7fa}
+    .gate-card{width:min(100%,505px);background:#fff;border:1px solid var(--l);border-radius:20px;padding:46px 44px 40px;text-align:center;box-shadow:0 14px 34px #1f3e6314}
+    .gate-brand{color:var(--o);font-size:16px;font-weight:800;letter-spacing:.14em}
+    .gate-card h1{margin:12px 0 7px;color:var(--n);font-size:38px;line-height:1.22}
+    .gate-subtitle{color:#748093;font-size:12px;font-weight:700;letter-spacing:.12em}
+    .gate-divider{width:46px;height:3px;margin:24px auto;background:var(--o);border-radius:999px}
+    .gate-form label{display:block;color:var(--n);font-size:23px;font-weight:800;margin-bottom:14px}
+    .gate-row{display:grid;gap:12px}
+    .gate-input{width:100%;height:56px;border:1px solid #aebdcd;border-radius:12px;padding:10px 14px;font:inherit;font-size:24px;text-align:center;letter-spacing:.3em}
+    .gate-input:focus{outline:3px solid #f39a1433;border-color:var(--o)}
+    .gate-button,.logout{border:0;border-radius:12px;padding:12px 18px;font:inherit;font-weight:800;cursor:pointer}
+    .gate-button{width:100%;min-height:54px;background:var(--n);color:#fff}
+    .gate-button:disabled,.gate-input:disabled{cursor:not-allowed;opacity:.65}
+    .gate-message{min-height:26px;margin:12px 0 0;color:#b42318;font-size:15px;font-weight:700;line-height:1.5}
+    .gate-note{margin:12px 0 0;color:var(--m);font-size:13px;line-height:1.5}
+    .wrap{max-width:1180px;margin:auto;padding:30px 18px 44px}
+    .head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+    .head-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .eyebrow{color:var(--o);font-weight:800;letter-spacing:.08em;font-size:18px}
+    .head h1{margin:8px 0 0;color:var(--n);font-size:42px}
+    .sub{color:var(--m);margin-top:10px;font-size:19px}
+    .admin,.logout{background:#fff;border:1px solid var(--l);color:var(--n);text-decoration:none;padding:12px 16px;border-radius:12px;font-weight:800;box-shadow:0 5px 16px #1f3e6310;font-size:18px}
+    .logout{color:#8b2c22}
+    .intro{margin:26px 0 22px;background:#fff;border:1px solid var(--l);border-radius:16px;padding:16px 20px;box-shadow:0 6px 20px #1f3e630d;font-size:18px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:28px;box-shadow:0 10px 28px #1f3e6312}
+    .icon{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:#eef3f8}
+    .card h2{color:var(--n);font-size:30px;margin:18px 0 8px}
+    .card p{color:var(--m);line-height:1.7;font-size:18px}
+    .meta{font-weight:800;color:var(--n);margin:18px 0;font-size:18px}
+    .btn{display:inline-block;text-decoration:none;border-radius:12px;padding:12px 18px;font-weight:800;color:#fff;background:var(--n);font-size:18px}
+    .btn.teal{background:var(--t)}
+    .status{margin-top:22px;background:#fff;border:1px solid var(--l);border-radius:16px;padding:15px 18px;display:flex;gap:24px;flex-wrap:wrap;font-size:18px}
+    .ok{color:#2f855a;font-weight:800}
+    .build{color:#8a6d1d;font-weight:800}
+    .foot{margin-top:24px;text-align:right;color:var(--m);font-size:15px}
+    @media(max-width:760px){body{font-size:17px}.head{flex-direction:column}.grid{grid-template-columns:1fr}.head h1{font-size:34px}.head-actions{width:100%}.admin,.logout{font-size:17px}.sub,.card p,.meta,.intro,.status,.btn{font-size:17px}}
+    @media(max-width:430px){.gate{padding:24px 16px}.gate-card{padding:34px 20px 28px}.gate-card h1{font-size:29px}.gate-brand{font-size:14px}.gate-subtitle{font-size:11px;letter-spacing:.08em}.gate-form label{font-size:20px}.gate-input{height:58px}.gate-button{min-height:56px}}
+  </style>
+</head>
+<body>
+  <div class="top"></div>
+
+  <section class="gate" id="accessGate" aria-labelledby="gateTitle">
+    <div class="gate-card">
+      <div class="gate-brand">CHEN DAR ENTERPRISE</div>
+      <h1 id="gateTitle">晨達線上測驗平台</h1>
+      <div class="gate-subtitle">CHEN DAR ONLINE TEST PLATFORM</div>
+      <div class="gate-divider" aria-hidden="true"></div>
+      <form class="gate-form" id="accessForm">
+        <label for="accessCode">請輸入通行碼</label>
+        <div class="gate-row">
+          <input class="gate-input" id="accessCode" name="accessCode" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="off" required>
+          <button class="gate-button" id="accessButton" type="submit">進入平台</button>
+        </div>
+        <p class="gate-message" id="accessMessage" role="status" aria-live="polite"></p>
+      </form>
+      <p class="gate-note">僅供晨達企業內部教育訓練使用</p>
+    </div>
+  </section>
+
+  <main class="wrap" id="platformHome" hidden>
+    <div class="head">
+      <div>
+        <div class="eyebrow">CHEN DAR ENTERPRISE</div>
+        <h1>晨達線上測驗平台</h1>
+        <div class="sub">教育訓練｜能力鑑定｜成績管理</div>
+      </div>
+      <div class="head-actions">
+        <a class="admin" href="admin.html">⚙ 管理員登入</a>
+        <button class="logout" id="logoutButton" type="button">退出平台</button>
+      </div>
+    </div>
+    <div class="intro"><strong>請選擇測驗系統</strong>｜不同測驗依其使用情境採用不同作答流程。</div>
+    <section class="grid">
+      <article class="card">
+        <div class="icon">👥</div>
+        <h2>現場幹部培訓</h2>
+        <p>8堂基礎幹部課程，從會做，走向會帶、會管、會改善。</p>
+        <div class="meta">8堂課程｜目前開放第1堂</div>
+        <a class="btn" href="leader-training.html">進入培訓中心</a>
+      </article>
+      <article class="card">
+        <div class="icon">🎧</div>
+        <h2>移工中文聽力鑑定</h2>
+        <p>中文聽力能力測驗，包含考生作答、考官控制與成績管理。</p>
+        <div class="meta">50題｜A/B/C/D四版本｜批次同步</div>
+        <a class="btn teal" href="https://script.google.com/macros/s/AKfycbwh57cjiwtEYx0TO11qaJOaaMKGjlfwSbgiDjwBIhsW9o5C6vrMYcOdir_rXnGHlsf3/exec">進入鑑定系統</a>
+      </article>
+    </section>
+    <div class="status">
+      <div>現場幹部培訓：<span class="ok">已上線</span></div>
+      <div>移工中文聽力鑑定：<span class="ok">測試中</span></div>
+    </div>
+    <div class="foot">晨達企業｜線上測驗平台　平台版本 V1.0｜更新日期 2026-09-08</div>
+  </main>
+
+  <script>
+    (() => {
+      const ACCESS_CODE = '2468';
+      const AUTH_DURATION_MS = 4 * 60 * 60 * 1000;
+      const LOCK_DURATION_MS = 10 * 60 * 1000;
+      const MAX_FAILED_ATTEMPTS = 5;
+      const STORAGE_KEYS = {
+        authUntil: 'chendaPlatformAuthUntil',
+        failedAttempts: 'chendaPlatformFailedAttempts',
+        lockUntil: 'chendaPlatformLockUntil'
+      };
+
+      const gate = document.getElementById('accessGate');
+      const platformHome = document.getElementById('platformHome');
+      const form = document.getElementById('accessForm');
+      const codeInput = document.getElementById('accessCode');
+      const accessButton = document.getElementById('accessButton');
+      const message = document.getElementById('accessMessage');
+      const logoutButton = document.getElementById('logoutButton');
+      let lockTimer = null;
+      let authTimer = null;
+
+      const readTime = key => Number(localStorage.getItem(key) || 0);
+
+      function clearAuthTimer() {
+        if (authTimer) clearTimeout(authTimer);
+        authTimer = null;
+      }
+
+      function showGate() {
+        clearAuthTimer();
+        platformHome.hidden = true;
+        gate.hidden = false;
+        codeInput.value = '';
+        updateLockState();
+        if (!codeInput.disabled) codeInput.focus();
+      }
+
+      function showPlatform(authUntil) {
+        if (lockTimer) clearInterval(lockTimer);
+        lockTimer = null;
+        gate.hidden = true;
+        platformHome.hidden = false;
+        clearAuthTimer();
+        authTimer = setTimeout(() => {
+          localStorage.removeItem(STORAGE_KEYS.authUntil);
+          showGate();
+        }, Math.max(0, authUntil - Date.now()));
+      }
+
+      function updateLockState() {
+        const lockUntil = readTime(STORAGE_KEYS.lockUntil);
+        const remainingMs = lockUntil - Date.now();
+
+        if (remainingMs <= 0) {
+          if (lockTimer) clearInterval(lockTimer);
+          lockTimer = null;
+          localStorage.removeItem(STORAGE_KEYS.lockUntil);
+          localStorage.removeItem(STORAGE_KEYS.failedAttempts);
+          codeInput.disabled = false;
+          accessButton.disabled = false;
+          message.textContent = '';
+          return;
+        }
+
+        codeInput.disabled = true;
+        accessButton.disabled = true;
+        const remainingSeconds = Math.ceil(remainingMs / 1000);
+        const minutes = Math.floor(remainingSeconds / 60);
+        const seconds = String(remainingSeconds % 60).padStart(2, '0');
+        message.textContent = `輸入錯誤次數過多，請於 ${minutes}:${seconds} 後再試。`;
+
+        if (!lockTimer) lockTimer = setInterval(updateLockState, 1000);
+      }
+
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        if (readTime(STORAGE_KEYS.lockUntil) > Date.now()) {
+          updateLockState();
+          return;
+        }
+
+        if (codeInput.value === ACCESS_CODE) {
+          const authUntil = Date.now() + AUTH_DURATION_MS;
+          localStorage.setItem(STORAGE_KEYS.authUntil, String(authUntil));
+          localStorage.removeItem(STORAGE_KEYS.failedAttempts);
+          localStorage.removeItem(STORAGE_KEYS.lockUntil);
+          message.textContent = '';
+          showPlatform(authUntil);
+          return;
+        }
+
+        const failedAttempts = readTime(STORAGE_KEYS.failedAttempts) + 1;
+        localStorage.setItem(STORAGE_KEYS.failedAttempts, String(failedAttempts));
+        codeInput.value = '';
+
+        if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
+          localStorage.setItem(STORAGE_KEYS.lockUntil, String(Date.now() + LOCK_DURATION_MS));
+          updateLockState();
+        } else {
+          message.textContent = `通行碼不正確，還可嘗試 ${MAX_FAILED_ATTEMPTS - failedAttempts} 次。`;
+          codeInput.focus();
+        }
+      });
+
+      logoutButton.addEventListener('click', () => {
+        Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+        showGate();
+      });
+
+      const authUntil = readTime(STORAGE_KEYS.authUntil);
+      if (authUntil > Date.now()) showPlatform(authUntil);
+      else {
+        localStorage.removeItem(STORAGE_KEYS.authUntil);
+        showGate();
+      }
+    })();
+  </script>
+</body>
+</html>
