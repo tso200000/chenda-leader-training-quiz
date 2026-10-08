@@ -181,6 +181,7 @@ text-align:center}.metric .label{font-size:17px}.tool p{font-size:17px}.wrap{pad
 </section>
 </main>
 <script>const API='https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec';
+const LIVE_COURSE_IDS=new Set(['C01','C02','C03']);
 let token=sessionStorage.getItem('chendaAdminToken')||'';
 if(token){showDashboard();
 loadSummary();
@@ -207,13 +208,13 @@ if(!d.ok){sessionStorage.removeItem('chendaAdminToken');
 alert(d.error||'登入已失效');
 location.reload();
 return;
-}mOpen.textContent=d.overview.openCourses+'/'+d.overview.totalCourses;
+}mOpen.textContent=LIVE_COURSE_IDS.size+'/'+d.overview.totalCourses;
 mAttempts.textContent=d.overview.totalAttempts;
 mAvg.textContent=d.overview.avgScore==null?'—':d.overview.avgScore+' 分';
 mPass.textContent=d.overview.pass80==null?'—':d.overview.pass80+'%';
 courseRows.innerHTML='';
 d.courses.forEach(c=>{const tr=document.createElement('tr');
-const active=c.status==='open';
+const active=LIVE_COURSE_IDS.has(c.id);
 tr.innerHTML=`<td>${c.id.replace('C','')}｜${c.name}</td>
 <td>
 <span class="status ${active?'open':'coming'}">${active?'開放':'準備中'}</span>
