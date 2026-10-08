@@ -31,6 +31,19 @@ test('管理工具分別產生第1至第3堂的統計與成績入口', () => {
   assert.match(leaderboard.innerHTML, /leaderboard\.html\?courseId=C03[^>]*>第3堂/);
 });
 
+test('上課簡報入口依課程開啟正確的 Google Drive 檔案', () => {
+  const { renderCourseSlideLinks } = loadCourseContext();
+  const slides = { innerHTML: '' };
+
+  renderCourseSlideLinks(slides);
+
+  assert.equal((slides.innerHTML.match(/<a /g) || []).length, 3);
+  assert.match(slides.innerHTML, /href="https:\/\/docs\.google\.com\/presentation\/d\/1BX5wWaszSJTwxCKt6Mh9P76pGP7dhrkH\/edit\?usp=drivesdk&amp;ouid=116493872695254554480&amp;rtpof=true&amp;sd=true"[^>]*target="_blank"[^>]*>[^<]*<span>第一堂<\/span>/);
+  assert.match(slides.innerHTML, /href="https:\/\/docs\.google\.com\/presentation\/d\/1kTR-a77AyvccZb60p2xJnnMftGA8QxRM\/edit\?usp=drivesdk&amp;ouid=116493872695254554480&amp;rtpof=true&amp;sd=true"[^>]*target="_blank"[^>]*>[^<]*<span>第二堂<\/span>/);
+  assert.match(slides.innerHTML, /href="https:\/\/docs\.google\.com\/presentation\/d\/1Kgd37u0VXOMXav8Il9N9nDNJdrf8Ojn_\/edit\?usp=drivesdk&amp;ouid=116493872695254554480&amp;rtpof=true&amp;sd=true"[^>]*target="_blank"[^>]*>[^<]*<span>第三堂<\/span>/);
+  assert.equal((slides.innerHTML.match(/rel="noopener noreferrer"/g) || []).length, 3);
+});
+
 test('統計與成績頁依所選課程顯示名稱並返回正確測驗', () => {
   const { applyCoursePageContext } = loadCourseContext();
   const makeDocument = () => ({
