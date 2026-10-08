@@ -5,6 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.join(__dirname, '..');
+const CourseContext = require(path.join(root, 'course-context.js'));
 
 function dashboardContext(summary) {
   const html = fs.readFileSync(path.join(root, 'leader-admin.html'), 'utf8');
@@ -19,13 +20,21 @@ function dashboardContext(summary) {
     appendChild(child) { rows.push(child); },
   });
 
+  const elements = {
+    statsCourseLinks: element(),
+    leaderboardCourseLinks: element(),
+  };
   const context = {
+    CourseContext,
     sessionStorage: {
       getItem() { return ''; },
       setItem() {},
       removeItem() {},
     },
-    document: { createElement: element },
+    document: {
+      createElement: element,
+      getElementById(id) { return elements[id] || null; },
+    },
     fetch: async () => ({ json: async () => summary }),
     alert() {},
     location: { reload() {} },
