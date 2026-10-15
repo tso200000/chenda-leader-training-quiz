@@ -29,9 +29,9 @@ test('第三堂正式測驗包含已確認的 25 題與 C03 成績識別', () =>
   assert.deepEqual(Array.from(questions.map(q => q[3])), [0,2,1,0,0,3,1,0,0,3,2,3,1,0,1,3,2,1,1,3,3,2,3,2,2]);
 });
 
-test('培訓首頁正式開放第三堂並顯示目前開放 3 堂', () => {
+test('培訓首頁正式開放第三堂並顯示目前開放 5 堂', () => {
   const html = read('leader-training.html');
-  assert.match(html, /目前開放 <strong>3 堂<\/strong>/);
+  assert.match(html, /目前開放 <strong>5 堂<\/strong>/);
   assert.match(html, /<a class="go" href="course03\.html">開始測驗<\/a>/);
 });
 
@@ -39,3 +39,4 @@ test('統計頁依 C03 載入第三堂題庫', () => {
   const html = read('stats.html');
   assert.match(html, /C03.*course03\.html/);
 });
+

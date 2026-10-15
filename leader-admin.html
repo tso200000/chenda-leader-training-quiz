@@ -222,7 +222,7 @@ text-align:center}.metric .label{font-size:17px}.tool p{font-size:17px}.wrap{pad
 </main>
 <script src="course-context.js"></script>
 <script>const API='https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec';
-const LIVE_COURSE_IDS=new Set(['C01','C02','C03']);
+const LIVE_COURSE_IDS=new Set(['C01','C02','C03','C05','C06']);
 CourseContext.renderCourseSlideLinks(document.getElementById('slideCourseLinks'));
 CourseContext.renderCourseToolLinks(document.getElementById('statsCourseLinks'),'stats');
 CourseContext.renderCourseToolLinks(document.getElementById('leaderboardCourseLinks'),'leaderboard');
@@ -259,14 +259,15 @@ mPass.textContent=d.overview.pass80==null?'—':d.overview.pass80+'%';
 courseRows.innerHTML='';
 d.courses.forEach(c=>{const tr=document.createElement('tr');
 const active=LIVE_COURSE_IDS.has(c.id);
+if(c.id==='C05'||c.id==='C06'){const shared=d.courses.find(row=>row.id==='C05');c={...c,count:shared?.count||0,avgScore:shared?.avgScore??null,pass80:shared?.pass80??null};}
 tr.innerHTML=`<td>${c.id.replace('C','')}｜${c.name}</td>
 <td>
-<span class="status ${active?'open':'coming'}">${active?'開放':'準備中'}</span>
+<span class="status ${active?'open':'coming'}">${active?((c.id==='C05'||c.id==='C06')?'開放（5、6堂合併）':'開放'):'準備中'}</span>
 </td>
 <td>${c.count||0}</td>
 <td>${c.avgScore==null?'—':c.avgScore}</td>
 <td>${c.pass80==null?'—':c.pass80+'%'}</td>
-<td>${active?`<a class="btn" href="stats.html?courseId=${c.id}">查看</a>`:'—'}</td>`;
+<td>${active?`<a class="btn" href="stats.html?courseId=${c.id==='C06'?'C05':c.id}">查看</a>`:'—'}</td>`;
 courseRows.appendChild(tr);
 });
 }catch(e){alert('無法取得管理統計資料。');
@@ -286,3 +287,4 @@ loadSummary();
 }}</script>
 </body>
 </html>
+

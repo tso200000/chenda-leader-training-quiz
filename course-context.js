@@ -16,10 +16,11 @@
       id: 'C03', number: 3, ordinal: '第三堂', name: '品質意識與自主檢查', page: 'course03.html',
       slideUrl: 'https://docs.google.com/presentation/d/1Kgd37u0VXOMXav8Il9N9nDNJdrf8Ojn_/edit?usp=drivesdk&ouid=116493872695254554480&rtpof=true&sd=true',
     },
+    { id: 'C05', number: '5、6', ordinal: '第5、6堂', name: '新人帶教、現場溝通與工作交接', page: 'course56.html', slideUrl: null },
   ];
 
   function getCourseContext(courseId) {
-    return COURSES.find(course => course.id === courseId) || COURSES[0];
+    return COURSES.find(course => course.id === (courseId === 'C06' ? 'C05' : courseId)) || COURSES[0];
   }
 
   function renderCourseToolLinks(container, type) {
@@ -32,7 +33,7 @@
 
   function renderCourseSlideLinks(container) {
     if (!container) return;
-    container.innerHTML = COURSES.map(course => {
+    container.innerHTML = COURSES.filter(course => course.slideUrl).map(course => {
       const slideUrl = course.slideUrl.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
       return `<a class="slide-link" href="${slideUrl}" target="_blank" rel="noopener noreferrer">
         <span>${course.ordinal}</span><small>${course.name}</small>
@@ -62,3 +63,4 @@
 
   return { COURSES, getCourseContext, renderCourseToolLinks, renderCourseSlideLinks, applyCoursePageContext };
 });
+

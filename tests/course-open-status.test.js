@@ -75,10 +75,11 @@ test('管理頁將已有正式入口的前3堂顯示為開放並提供查看功�
 
   await context.loadSummary();
 
-  assert.equal(context.mOpen.textContent, '3/8');
+  assert.equal(context.mOpen.textContent, '5/8');
   assert.match(rows[1].innerHTML, /status open[^>]*>開放/);
   assert.match(rows[1].innerHTML, /stats\.html\?courseId=C02/);
   assert.match(rows[2].innerHTML, /status open[^>]*>開放/);
   assert.match(rows[2].innerHTML, /stats\.html\?courseId=C03/);
   assert.match(rows[3].innerHTML, /status coming[^>]*>準備中/);
 });
+

@@ -12,7 +12,7 @@ function loadCourseContext() {
   return require(modulePath);
 }
 
-test('管理工具分別產生第1至第3堂的統計與成績入口', () => {
+test('管理工具分別產生第1至第3堂及第5、6堂合併的統計與成績入口', () => {
   const { renderCourseToolLinks } = loadCourseContext();
   const stats = { innerHTML: '' };
   const leaderboard = { innerHTML: '' };
@@ -20,12 +20,12 @@ test('管理工具分別產生第1至第3堂的統計與成績入口', () => {
   renderCourseToolLinks(stats, 'stats');
   renderCourseToolLinks(leaderboard, 'leaderboard');
 
-  assert.equal((stats.innerHTML.match(/<a /g) || []).length, 3);
+  assert.equal((stats.innerHTML.match(/<a /g) || []).length, 4);
   assert.match(stats.innerHTML, /stats\.html\?courseId=C01[^>]*>第1堂/);
   assert.match(stats.innerHTML, /stats\.html\?courseId=C02[^>]*>第2堂/);
   assert.match(stats.innerHTML, /stats\.html\?courseId=C03[^>]*>第3堂/);
 
-  assert.equal((leaderboard.innerHTML.match(/<a /g) || []).length, 3);
+  assert.equal((leaderboard.innerHTML.match(/<a /g) || []).length, 4);
   assert.match(leaderboard.innerHTML, /leaderboard\.html\?courseId=C01[^>]*>第1堂/);
   assert.match(leaderboard.innerHTML, /leaderboard\.html\?courseId=C02[^>]*>第2堂/);
   assert.match(leaderboard.innerHTML, /leaderboard\.html\?courseId=C03[^>]*>第3堂/);
@@ -68,3 +68,4 @@ test('統計與成績頁依所選課程顯示名稱並返回正確測驗', () =>
   assert.equal(leaderboardDocument.elements.courseQuizLink.href, 'course03.html');
   assert.equal(leaderboardDocument.title, '成績列表｜第三堂｜品質意識與自主檢查');
 });
+
