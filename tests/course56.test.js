@@ -8,6 +8,7 @@ const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const html=read('course56.html');
 const bank=vm.runInNewContext(html.match(/const Q=(\[[\s\S]*?\]);window\.QUESTION_BANK=Q/)[1]);
 const context=require('../course-context.js');
+const statsMeta=require('../apps-script/course56-question-meta.js');
 test('合併題庫正確保留核定25題與答案',()=>{
  assert.equal(bank.length,25);
  assert.ok(bank.every(q=>q.length===4&&q[2].length===4));
@@ -18,10 +19,16 @@ test('合併題庫正確保留核定25題與答案',()=>{
  assert.match(bank[23][1],/指定位置/);
  assert.match(bank[24][1],/哪一個選項的判斷正確/);
 });
+test('第五六堂雲端錯題統計對照表與正式題庫一致',()=>{
+ assert.equal(statsMeta.length,bank.length);
+ assert.deepEqual(statsMeta.map(row=>row[0]),Array.from(bank,row=>row[0]));
+ assert.deepEqual(statsMeta.map(row=>row[1]),Array.from(bank,row=>row[1]));
+ assert.deepEqual(statsMeta.map(row=>row[2]),Array.from(bank,row=>row[3]));
+});
 test('第五六堂入口同一測驗且僅一份成績',()=>{
  const home=read('leader-training.html');
  assert.equal((home.match(/href="course56.html"/g)||[]).length,2);
- assert.match(home,/目前開放 <strong>5 堂/);
+ assert.match(home,/目前開放 <strong>8 堂/);
  assert.match(html,/courseId:'C05'/);
  assert.doesNotMatch(html,/C03|品質意識與自主檢查/);
  assert.match(html,/course:'第5、6堂｜新人帶教、現場溝通與工作交接'/);
