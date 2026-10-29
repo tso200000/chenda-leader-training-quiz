@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>晨達｜現場幹部總會考</title>
+<style>
+:root{--n:#1f3e63;--o:#f39a14;--bg:#f4f7fa;--l:#dbe3ec;--m:#667085;--ok:#237a4b;--bad:#b42318}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;background:var(--bg);color:#1f2937;font-size:20px}
+.top{height:14px;background:var(--n)}
+.wrap{max-width:980px;margin:auto;padding:28px 18px 48px}
+.head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:20px}
+.eyebrow{color:var(--o);font-weight:900;letter-spacing:.08em;font-size:21px}
+h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
+.sub{color:var(--m);margin-top:12px;line-height:1.6;font-size:21px}
+.back{display:inline-block;text-decoration:none;background:#fff;color:var(--n);border:1px solid var(--l);border-radius:13px;padding:13px 17px;font-weight:900;white-space:nowrap;font-size:19px}
+.status{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.stat{background:#fff;border:1px solid var(--l);border-radius:15px;padding:15px 18px;font-weight:900;color:var(--n);font-size:20px}
+.progress{height:10px;background:#e7edf4;border-radius:999px;overflow:hidden;margin-top:10px}.progress span{display:block;height:100%;background:var(--o);width:0}
+.card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:30px;box-shadow:0 10px 28px #1f3e6312}
+.card h2{font-size:29px;color:var(--n);margin:0 0 18px}
+.register-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+.register-grid label{font-weight:900;color:var(--n);font-size:21px}
+.register-grid input{width:100%;margin-top:8px;padding:15px 16px;border:1px solid var(--l);border-radius:12px;font:inherit;font-size:22px}
+.qno{font-size:20px;color:var(--o);font-weight:900;letter-spacing:.05em}
+.question{color:var(--n);font-size:34px;font-weight:900;line-height:1.55;margin:12px 0 24px}
+.options{display:grid;gap:14px}
+.option{width:100%;text-align:left;border:2px solid #cbd6e2;background:#fff;border-radius:15px;padding:19px 21px;cursor:pointer;font:inherit;font-size:27px;color:#1f2937;line-height:1.5}
+.option:hover{border-color:var(--n);background:#f8fafc}.option.selected{border-color:var(--o);background:#fff8ea}
+.option strong{display:inline-block;width:38px;color:var(--n)}
+.actions{display:flex;justify-content:space-between;gap:14px;margin-top:24px;flex-wrap:wrap}
+.btn{border:0;background:var(--n);color:#fff;border-radius:13px;padding:14px 20px;font:inherit;font-size:21px;font-weight:900;cursor:pointer}
+.btn.alt{background:#fff;color:var(--n);border:1px solid var(--l)}
+.btn.submit{background:var(--o)}
+.result{display:none}.result.show{display:block}
+.score{text-align:center;font-size:58px;font-weight:900;color:var(--n);margin:10px 0}
+.review-item{padding:18px 0;border-top:1px solid var(--l);line-height:1.7;font-size:19px}
+.bad{color:var(--bad)}.ok{color:var(--ok)}
+.note{margin-top:16px;color:var(--m);font-size:17px;line-height:1.6}
+@media(max-width:700px){
+  body{font-size:19px}.wrap{padding:20px 12px 38px}.head{flex-direction:column}h1{font-size:36px}.sub{font-size:19px}
+  .status{grid-template-columns:1fr}.card{padding:20px 16px}.card h2{font-size:27px}.register-grid{grid-template-columns:1fr}
+  .register-grid label{font-size:20px}.register-grid input{font-size:22px;padding:15px}.question{font-size:30px;line-height:1.55}
+  .option{font-size:25px;padding:17px 16px}.btn{font-size:20px;padding:13px 17px}.back{font-size:18px}.stat{font-size:19px}
+}
+@media(max-width:420px){h1{font-size:33px}.question{font-size:28px}.option{font-size:23px}.option strong{width:34px}.card{padding:18px 13px}}
+</style>
+</head>
+<body>
+<div class="top"></div>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <div class="eyebrow">FINAL EXAM｜正式考試</div>
+      <h1>總會考｜1～8堂綜合測驗</h1>
+      <div class="sub">40題｜每題2.5分｜滿分100分<br>考題固定，答案選項每次考試重新排列；交卷前不顯示答案。</div>
+    </div>
+    <a class="back" href="leader-training.html">← 培訓中心</a>
+  </div>
+
+  <div class="status" id="examStatus" hidden>
+    <div class="stat">進度：<span id="progressText">1 / 40</span><div class="progress"><span id="progressBar"></span></div></div>
+    <div class="stat">已作答：<span id="answeredText">0 / 40</span></div>
+  </div>
+
+  <section class="card">
+    <div id="startForm">
+      <h2>考試登記</h2>
+      <div class="register-grid">
+        <label>工號<input id="employeeId" autocomplete="off" inputmode="text" placeholder="請輸入工號"></label>
+        <label>姓名<input id="employeeName" autocomplete="name" placeholder="請自行輸入姓名"></label>
+      </div>
+      <button class="btn" id="startExamButton">開始測驗</button>
+    </div>
+
+    <div id="questionView" hidden>
+      <div class="qno" id="qno"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="actions">
+        <button class="btn alt" id="prevButton">上一題</button>
+        <button class="btn" id="nextButton">下一題</button>
+        <button class="btn submit" id="submitButton" hidden>交卷</button>
+      </div>
+    </div>
+
+    <div class="result" id="resultView">
+      <div class="eyebrow">RESULT｜成績</div>
+      <div class="score" id="score"></div>
+      <div id="summary"></div>
+      <div id="review"></div>
+      <div class="actions">
+        <a class="btn alt" href="leader-training.html" style="text-decoration:none">返回培訓中心</a>
+        <button class="btn" id="restartButton">重新測驗</button>
+      </div>
+    </div>
+  </section>
+  <div class="note">正式總會考共40題。作答期間不提示正確答案，交卷後顯示成績與錯題。</div>
+</main>
+
+<script>
+(() => {
+  const enteredPassword = window.prompt('Formal Exam Password｜請輸入正式考試密碼');
+  if (enteredPassword !== '9876') {
+    window.alert('Incorrect password｜密碼錯誤');
+    window.location.replace('leader-training.html');
+    return;
+  }
+
+  const QUESTIONS = [
+    {q:'一名資深技術員升任組長後，自己的工作仍能穩定完成，但組員常不知道工作先後順序，也常因彼此等待而影響進度。他目前最需要補強哪一項能力？',c:['提高處理困難工作的效率','掌握人員、進度與團隊結果','增加各項設備的操作能力','在工作落後時主動協助'],a:1},
+    {q:'早上組長已完成工作分配。下午發現有人已做完、有人進度落後，另一個人正在等待下一項工作。組長認為：「早上都交代好了，每個人自己負責即可。」最大的問題是？',c:['每天都應重新分配所有工作','組長應直接幫落後的人完成','分配後仍要持續掌握團隊狀況','工作落後主要是作業員的責任'],a:2},
+    {q:'某項工作已有正式作業標準。一名熟手發現另一種方法更快，目前試做產品也符合要求。較適當的觀念是？',c:['品質正常就可以改用新方法','先依現行標準，再提出改善確認','熟手可改，新人維持原本方式','先使用新方法，有問題再恢復'],a:1},
+    {q:'以下四名人員技術能力都很好。哪一位最接近成熟的現場幹部？',c:['能掌握人員與工作，並確認結果','異常發生時能最快親自處理','必要時會主動幫忙補足產量','工作分配完成後由人員自行負責'],a:0},
+    {q:'目前有三項工作：工單甲今天下午交貨但仍有時間；工單乙明天交貨，但下一站4人正在等料；工單丙是急單，但材料尚未到。工單乙目前人員、材料、設備都已具備。哪一項較適合優先處理？',c:['工單甲，因為今天交貨應優先於明天交貨','工單丙，因為掛急單後應維持最高順位','工單甲與工單乙平均分配人力，同時向前推進','工單乙，因為目前能做，而且不做會立即影響下一站'],a:3},
+    {q:'今日計畫100件，中午完成45件。幹部接下來較合理的做法是？',c:['先要求現場加快，下午再確認有沒有追上','比較計畫與實際，再確認剩餘量、卡點及是否需調整','先記錄完成45件，其他資料下班前再統一整理','先維持原安排，避免太早介入影響現場作業節奏'],a:1},
+    {q:'現在9點，兩組人力最多同時推進兩項工作：工單甲今天16點交貨，尚需3小時；工單乙明天交貨，但40分鐘後下一站會斷料；工單丙是超急單，主要材料12點才到，目前可先做30分鐘前置準備。哪種安排較合理？',c:['先推工單甲與工單丙，因今天交期與超急單應同時保住','先推工單乙與工單丙，因後段等待與超急單最具急迫性','先推工單甲與工單乙，工單丙完成必要前置後待材料到貨再重新安排','三項工作輪流投入人力，避免任何一張單長時間停住'],a:2},
+    {q:'中午同時出現：工單甲進度稍慢但仍有時間餘裕；工單乙目前進度正常；工單丙瓶頸設備異常，多項後續工作都需要經過；工單丁明天才交貨。哪一項最值得優先處理？',c:['工單甲，因為已出現落後跡象','工單丙，因瓶頸異常可能擴大成整體進度問題','工單乙，確保目前正常的工作不被其他問題打亂','工單丁，提早完成可以降低明天的交期壓力'],a:1},
+    {q:'兩個工作日的紀錄如下：甲日計畫100件、有效產出98件、無效2件、損耗1小時，設備問題已排除；乙日計畫90件、有效產出90件、無效0件、損耗4小時，其中3小時為待料，下一批材料到貨時間仍未確認。如果幹部要判斷「明天最需要先追哪個風險」，哪個較合理？',c:['先追甲日，因為98件沒有完成原定100件','兩天都接近或達成計畫，因此暫時不用特別追蹤','先追乙日材料問題，今天雖達標，但明天仍可能再次待料','先追甲日2件無效數量，因為數量異常比待料更重要'],a:2},
+    {q:'目前工單甲正在使用全廠唯一瓶頸設備，再50分鐘即可完成。此時新增一張今天必須交貨的工單乙急單。工單乙最晚再60分鐘開始使用瓶頸設備，仍可準時交貨；若現在中斷工單甲，重新設定設備會多花20分鐘。哪種安排較合理？',c:['工單乙是急單，立即停止工單甲並切換設備','讓工單甲先完成，再立即切換工單乙','工單甲進度正常，完成後再依原順位排工單乙','先調其他人力支援工單乙，設備暫時維持不變'],a:1},
+    {q:'客戶圖面標示尺寸公差為 ±0.2 mm，公司針對此產品正式訂定的作業標準為 ±0.1 mm。現場生產時應依哪個標準執行？',c:['依公司 ±0.1 mm 標準','依客戶 ±0.2 mm 標準，較容易完成生產','由作業人員依加工狀況自行選擇標準','兩個標準都先不採用，等產品完成後再決定'],a:0},
+    {q:'準備生產一批新規格產品時，哪一種做法最符合「第一次就把事情做對」？',c:['先確認首件符合要求，再繼續生產','先完成整批產品，再統一安排尺寸及外觀檢查','先依過去經驗製作，發現差異時再調整做法','先交給下一道工序，再確認產品是否能夠使用'],a:0},
+    {q:'客戶反映產品組裝時不順利，但出貨前品檢曾判定合格。此時哪一種處理最符合「對客戶品質保證」？',c:['由品檢人員單獨負責，重新檢查當時的產品','請業務先向客戶說明，產品出貨前已經檢查合格','共同追查圖面、材料、製程與檢查條件','將責任交給最後一道製程，要求該單位提出改善'],a:2},
+    {q:'加工途中發現現場板材的厚度標示與工單不一致，但已經完成1件產品。此時最適合怎麼做？',c:['停止使用該批材料，隔離並確認已完成品','先將剩餘材料用完，再一次確認整批產品','已完成品保留使用，後續改用正確厚度材料','比較兩種材料的加工難度，再決定是否更換'],a:0},
+    {q:'某項不良每次都能在出貨前被檢查出來，但相同問題仍持續發生。下一步最適合怎麼做？',c:['提高檢查頻率，避免不良產品再次流到客戶','更新檢查表單，要求人員增加各項紀錄內容','分析原因，改善流程並追蹤結果','安排熟練人員，專門負責挑選及修整不良品'],a:2},
+    {q:'產品準備出貨時，發現推車最上方的產品有外觀撞傷；搬運前的檢查紀錄顯示10件均正常。此時最適合怎麼做？',c:['修整撞傷的1件，其餘9件依原檢查結果直接出貨','將撞傷產品移除，其餘9件改放另一台車後再出貨','重新確認10件，並追查搬運與堆放過程','搬運前已有檢查紀錄，應交由搬運人員負責處理'],a:2},
+    {q:'今天現場出現一個狀況，你要判斷它算不算異常，第一個要看什麼？',c:['是不是跟昨天完全一樣','大家有沒有覺得很麻煩','有沒有偏離原本的標準','有沒有影響今天的交期'],a:2},
+    {q:'你發現一件產品尺寸好像不對，後面還有20件準備接著做。這時你會怎麼處理？',c:['先把後面20件一起做完','熟手覺得可以就繼續做','先換一個人再做一件看看','後面的先別做，先確認尺寸'],a:3},
+    {q:'現場同時發生三件事：急單已經比原定進度慢一點；一件產品外觀有問題，但已經另外放開；一台設備的安全防護有問題，有人準備使用。你會先處理哪一件？',c:['先追急單，避免交期繼續落後','先處理安全防護有問題的設備','先確認外觀異常會不會再出現','三件事平均分人一起處理'],a:1},
+    {q:'同一批產品發現一件外觀有問題，已經另外放開；接著連續檢查5件都正常，但造成異常的原因還沒有確認。目前後面還有產品準備繼續生產。接下來怎麼做比較合理？',c:['後面5件都正常，可以先繼續生產','先確認異常原因與影響範圍，再決定是否續做','換熟手接手，之後產品再加強檢查','先把整批做完，再統一處理異常問題'],a:1},
+    {q:'同一台設備這星期卡住三次，三次都是不同人操作，每次清一下又可以繼續。今天又卡一次。你下一步最值得做什麼？',c:['換另一個熟手操作一段時間看看','再清一次，先把今天的工作做完','比較三次發生前有什麼共同點','增加巡查次數看能不能提早發現'],a:2},
+    {q:'熟手一直都會做這項工作，但這次規格改了；工單上雖然有更新，他還是照舊方法做錯。哪個改善比較值得先做？',c:['要求熟手每次自己記住規格變更','完工後再多查一次防止流出去','把這次錯誤公告給大家注意','開工前先講清楚這次哪裡不同'],a:3},
+    {q:'新人第一次學習一項新的作業，幹部採取哪一種帶教方式最合適？',c:['先示範完整作業，請新人自行練習，等有空時再確認最後成果','先說明並實際示範，讓新人動手操作，再依結果補充說明','先把工令、圖面與注意事項一次講完，再由新人自行完成','請資深同事先代替新人操作，等新人熟悉環境後再開始練習'],a:1},
+    {q:'新人昨天學會一般規格，今天工令的規格有變更。他說：「跟昨天一樣，我懂。」在開始加工前，哪一種做法最能確認他真的理解差異？',c:['請他指出新舊規格差異，說明操作重點後實作一次','將新版工令放在工作台上，提醒他操作時隨時查看','由幹部重新示範完整流程，請他站在旁邊仔細觀看','安排資深同仁在旁陪同，發現操作偏差時立即提醒'],a:0},
+    {q:'新人跟著熟手做了幾天，速度已經跟得上。他說：「我會了，可以自己做。」幹部怎麼確認比較合適？',c:['問熟手他這幾天表現如何，熟手說沒問題，就讓他自己做','看他做完的數量是否達標，數量跟得上，就讓他自己接著做','請他自己做一件，觀察關鍵步驟，再請他指出要檢查的地方','請他把操作順序完整說一次，說得出來，就安排他獨立作業'],a:2},
+    {q:'新人連續三天都由熟手在旁提醒，做出的產品也都合格。幹部準備安排他下週自己做，下列哪一個選項的判斷正確？',c:['連續三天都合格，表示做法已經熟悉，可以安排他自己做','目前只能確認有人提醒時做得好，還要看少了提醒能不能完成','熟手最清楚新人的能力，只要熟手同意，就能安排他自己做','新人能完整說出步驟，就表示已經理解，可以安排他獨立作業'],a:1},
+    {q:'現場幹部要交代一項工作，哪一種說法最清楚完整？',c:['阿明，先處理這一批兩件產品，速度盡量快，完成後放在原來的位置並回報','阿明，先處理工令260705-01，今天有空時完成，做完放到附近待製區並回報','阿明，先把目前這批兩件產品做完，中午前交給下一站，其他細節照以前處理','阿明，先處理工令260705-01的兩件產品，中午前完成備料，放到一樓待製區後回報'],a:3},
+    {q:'白班幹部要把未完成的工作交給晚班，哪一句最能讓接手的人不用再追問就可以開始？',c:['這批還沒全部做完，材料都放在原來的位置，晚班接著處理就可以','工令260715-02還差2件，照白班原來的做法繼續，有問題再問組長','阿明接工令260715-02剩2件，凌晨三點前在一樓待製區完成並回報','一樓待製區還有2件未完成，今天晚班要做完，完成後記得向組長回報'],a:2},
+    {q:'一張工令有10件風管，其中6件已焊好，這6件裡有4件已完成清洗。主管問：「這張工令現在做到哪？下午清洗的人力要怎麼排？」哪一種回報最合適？',c:['「焊接完成6件，清洗完成4件，目前合計完成10件，下午可以接下一張。」','「目前有4件清洗完成，其他還在處理，下午先照原本人力安排就好。」','「焊接已經超過一半，清洗也有進度，下午應該可以全部做完。」','「4件已清洗、2件焊好待洗、4件還沒焊好，下午清洗要配合焊接進度排。」'],a:3},
+    {q:'主管上午交代工令甲今天要完成，下午另一位主管又要求先做工令乙。兩張都說急，但現有人力做不完。幹部怎麼處理比較合適？',c:['先做下午才交代的工令乙，等工令甲的主管問起，再說明安排已改變','把兩張的進度、交期和人力說清楚，請兩位主管確認先後，再向同仁交代','請同仁兩張同時做、各完成一半，讓兩位主管都看得到工作有在推進','依自己的經驗先選一張趕完，另一張延後的原因，等下班回報時一起說明'],a:1},
+    {q:'這堂課講的5S，最重要不是漂亮，而是要做到什麼？',c:['讓現場看起來整齊又乾淨','讓正常和異常更容易被看見','讓主管不用一直到現場查看','讓所有區域都照同一種擺法'],a:1},
+    {q:'工具區固定應有10支工具。早上只看到9支，但昨天有人把一支送修，白板沒有留下紀錄。這件事最值得改善的是什麼？',c:['每天下班前把工具重新排整齊','工具借出時固定由一個人保管','工具放哪、少幾支、去了哪都要看得出來','少一支時先請全組一起找回來'],a:2},
+    {q:'甲區工具都有固定位置，但交班時不會點數；乙區每天都有點數，但工具沒有固定位置。如果要讓異常更容易被發現，你覺得哪種改善比較完整？',c:['固定位置，同時保留交班點數','只要交班點數，不必固定位置','只要固定位置，不必再做點數','改由熟手保管，其他人再借用'],a:0},
+    {q:'設備的防護剛剛鬆掉，熟手把它推回原位後說：「現在看起來好了，可以繼續。」你會怎麼處理？',c:['先提醒小心，做完後再檢查','先隔離現場，其他工作照常','先換熟手操作，再確認狀況','先停下、隔離、確認安全再做'],a:3},
+    {q:'現場同時有三個狀況：今天要出的產品只差最後幾件；通道旁半成品很多，轉彎已經要特別閃；一台設備的安全防護有點鬆，但目前還能運轉。如果你是幹部，哪個處理最合理？',c:['先把今天要出的產品做完再處理','先提醒大家注意通道和設備狀況','先處理會立即影響安全的狀況','先整理通道再讓熟手繼續操作'],a:2},
+    {q:'哪一組最接近有效紀錄應包含的內容？',c:['人員、主管、部門、結果','日期、班別、職稱、簽名','工單、設備、品名、主管','時間、對象、事實、數量、影響'],a:3},
+    {q:'連續4天待料30、45、60、40分鐘，目前最合理的判斷是？',c:['第三天管理最差','待料已重複發生','物料人員一定有錯','下週一定還會缺料'],a:1},
+    {q:'現場有人趕工、有人返工、有人等料、有人找工具。大家都很忙，幹部最好怎麼看？',c:['有事情做就代表效率正常','分辨產出時間與損耗時間','只看今天總完成件數','只要不停工就沒有問題'],a:1},
+    {q:'「設備異常」和「10:20停機，11:05恢復」最大的差別是什麼？',c:['後者可以累積與追蹤','後者已經找到根本原因','前者比較適合主管閱讀','前者才算正式紀錄'],a:0},
+    {q:'哪一條路徑最符合本堂最後的管理觀念？',c:['發現問題 → 設目標 → 找責任人 → 補紀錄','發生事情 → 留下紀錄 → 累積資料 → 看見問題','發生事情 → 主管判斷 → 找人處理 → 結案','建立表單 → 排名人員 → 找出表現差者'],a:1}
+  ];
+
+  const COUNT = QUESTIONS.length;
+  const letters = ['A','B','C','D'];
+  const storageKey = 'leader_final_exam_v1';
+  let orderMaps = [];
+  let answers = [];
+  let index = 0;
+  let employeeId = '';
+  let employeeName = '';
+  let startedAt = null;
+
+  function shuffledIndexes(n){
+    const a=Array.from({length:n},(_,i)=>i);
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+    return a;
+  }
+  function startNew(){
+    orderMaps = QUESTIONS.map(q=>shuffledIndexes(q.c.length));
+    answers = Array(COUNT).fill(null);
+    index = 0;
+    save();
+  }
+  function save(){sessionStorage.setItem(storageKey,JSON.stringify({orderMaps,answers,index,employeeId,employeeName,startedAt}))}
+  function load(){
+    try{
+      const x=JSON.parse(sessionStorage.getItem(storageKey)||'null');
+      if(x && Array.isArray(x.orderMaps) && x.orderMaps.length===COUNT && Array.isArray(x.answers) && x.answers.length===COUNT){
+        orderMaps=x.orderMaps;answers=x.answers;index=Math.max(0,Math.min(COUNT-1,Number(x.index)||0));employeeId=String(x.employeeId||'');employeeName=String(x.employeeName||'');startedAt=x.startedAt||null;return;
+      }
+    }catch(e){}
+    startNew();
+  }
+
+  const startForm=document.getElementById('startForm'), examStatus=document.getElementById('examStatus');
+  const employeeIdInput=document.getElementById('employeeId'), employeeNameInput=document.getElementById('employeeName'), startExamButton=document.getElementById('startExamButton');
+  const qno=document.getElementById('qno'), question=document.getElementById('question'), options=document.getElementById('options');
+  const progressText=document.getElementById('progressText'), progressBar=document.getElementById('progressBar'), answeredText=document.getElementById('answeredText');
+  const prevButton=document.getElementById('prevButton'), nextButton=document.getElementById('nextButton'), submitButton=document.getElementById('submitButton');
+  const questionView=document.getElementById('questionView'), resultView=document.getElementById('resultView');
+  const scoreEl=document.getElementById('score'), summary=document.getElementById('summary'), review=document.getElementById('review'), restartButton=document.getElementById('restartButton');
+
+  employeeIdInput.addEventListener('input',()=>{employeeId=employeeIdInput.value.trim();save()});
+  employeeNameInput.addEventListener('input',()=>{employeeName=employeeNameInput.value.trim();save()});
+
+  startExamButton.addEventListener('click',()=>{
+    employeeId=employeeIdInput.value.trim();
+    employeeName=employeeNameInput.value.trim();
+    if(!employeeId){alert('請輸入工號。');return}
+    if(!employeeName){alert('請輸入姓名。');return}
+    startedAt=new Date().toISOString();
+    startForm.hidden=true;examStatus.hidden=false;questionView.hidden=false;save();render();
+  });
+
+  function render(){
+    const q=QUESTIONS[index], map=orderMaps[index];
+    qno.textContent='Q'+String(index+1).padStart(2,'0')+' / '+COUNT;
+    question.textContent=q.q;
+    options.innerHTML='';
+    map.forEach((choiceIndex,displayIndex)=>{
+      const b=document.createElement('button');
+      b.className='option'+(answers[index]===choiceIndex?' selected':'');
+      b.innerHTML='<strong>'+letters[displayIndex]+'.</strong> '+q.c[choiceIndex];
+      b.addEventListener('click',()=>{answers[index]=choiceIndex;save();render()});
+      options.appendChild(b);
+    });
+    progressText.textContent=(index+1)+' / '+COUNT;
+    progressBar.style.width=((index+1)/COUNT*100)+'%';
+    answeredText.textContent=answers.filter(v=>v!==null).length+' / '+COUNT;
+    prevButton.disabled=index===0;
+    nextButton.hidden=index===COUNT-1;
+    submitButton.hidden=index!==COUNT-1;
+  }
+
+  prevButton.addEventListener('click',()=>{if(index>0){index--;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
+  nextButton.addEventListener('click',()=>{if(index<COUNT-1){index++;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
+
+  submitButton.addEventListener('click',()=>{
+    const missing=answers.filter(v=>v===null).length;
+    if(missing && !confirm('尚有 '+missing+' 題未作答，仍要交卷嗎？')) return;
+    const correct=QUESTIONS.reduce((n,q,i)=>n+(answers[i]===q.a?1:0),0);
+    const score=correct*2.5;
+    scoreEl.textContent=score.toFixed(1).replace('.0','')+' / 100';
+    summary.innerHTML='<p><strong>工號：</strong>'+escapeHtml(employeeId)+'　<strong>姓名：</strong>'+escapeHtml(employeeName)+'</p><p><strong>答對：</strong>'+correct+' / '+COUNT+'</p>';
+    review.innerHTML='<h2>錯題檢視</h2>';
+    QUESTIONS.forEach((q,i)=>{
+      if(answers[i]!==q.a){
+        const your=answers[i]===null?'未作答':q.c[answers[i]];
+        review.innerHTML+='<div class="review-item"><strong>Q'+(i+1)+'. '+escapeHtml(q.q)+'</strong><div class="bad">你的答案：'+escapeHtml(your)+'</div><div class="ok">正確答案：'+escapeHtml(q.c[q.a])+'</div></div>';
+      }
+    });
+    questionView.hidden=true;resultView.classList.add('show');sessionStorage.removeItem(storageKey);window.scrollTo({top:0,behavior:'smooth'});
+  });
+
+  restartButton.addEventListener('click',()=>{
+    startNew();employeeId='';employeeName='';startedAt=null;employeeIdInput.value='';employeeNameInput.value='';
+    resultView.classList.remove('show');questionView.hidden=true;examStatus.hidden=true;startForm.hidden=false;save();window.scrollTo({top:0,behavior:'smooth'});
+  });
+
+  function escapeHtml(v){return String(v).replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s]))}
+
+  load();
+  employeeIdInput.value=employeeId;employeeNameInput.value=employeeName;
+  if(employeeId&&employeeName&&startedAt){startForm.hidden=true;examStatus.hidden=false;questionView.hidden=false;render()}
+})();
+</script>
+</body>
+</html>
