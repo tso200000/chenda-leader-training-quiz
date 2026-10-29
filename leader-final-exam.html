@@ -200,6 +200,7 @@ h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
     if(!employeeId){alert('請輸入工號。');return}
     if(!employeeName){alert('請輸入姓名。');return}
     startedAt=new Date().toISOString();
+    try{localStorage.setItem('leader_final_exam_presence_v1',JSON.stringify({[employeeId]:{code:employeeId,name:employeeName,question:1,total:40,state:'active',lastSeen:Date.now(),startedAt:Date.now(),examDate:new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}}))}catch(e){}
     startForm.hidden=true;examStatus.hidden=false;questionView.hidden=false;save();render();
   });
 
