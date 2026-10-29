@@ -154,6 +154,18 @@ h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
   const COUNT = QUESTIONS.length;
   const letters = ['A','B','C','D'];
   const storageKey = 'leader_final_exam_v1';
+  const presenceKey = 'leader_final_exam_presence_v1';
+  let presenceTimer = null;
+  function presenceDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
+  function updatePresence(state='active'){
+    if(!employeeId||!employeeName)return;
+    let all={};try{all=JSON.parse(localStorage.getItem(presenceKey)||'{}')||{}}catch(e){}
+    const prev=all[employeeId]||{};
+    all[employeeId]={code:employeeId,name:employeeName,question:index+1,total:40,state,lastSeen:Date.now(),startedAt:prev.startedAt||Date.now(),examDate:presenceDate()};
+    localStorage.setItem(presenceKey,JSON.stringify(all));
+  }
+  function beginPresence(){if(presenceTimer)clearInterval(presenceTimer);updatePresence('active');presenceTimer=setInterval(()=>updatePresence('active'),5000)}
+  function finishPresence(){if(presenceTimer){clearInterval(presenceTimer);presenceTimer=null}updatePresence('finished')}
   let orderMaps = [];
   let answers = [];
   let index = 0;
@@ -205,6 +217,7 @@ h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
   });
 
   function render(){
+    if(startedAt)updatePresence('active');
     const q=QUESTIONS[index], map=orderMaps[index];
     qno.textContent='Q'+String(index+1).padStart(2,'0')+' / '+COUNT;
     question.textContent=q.q;
@@ -241,11 +254,11 @@ h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
         review.innerHTML+='<div class="review-item"><strong>Q'+(i+1)+'. '+escapeHtml(q.q)+'</strong><div class="bad">你的答案：'+escapeHtml(your)+'</div><div class="ok">正確答案：'+escapeHtml(q.c[q.a])+'</div></div>';
       }
     });
-    questionView.hidden=true;resultView.classList.add('show');sessionStorage.removeItem(storageKey);window.scrollTo({top:0,behavior:'smooth'});
+    finishPresence();questionView.hidden=true;resultView.classList.add('show');sessionStorage.removeItem(storageKey);window.scrollTo({top:0,behavior:'smooth'});
   });
 
   restartButton.addEventListener('click',()=>{
-    startNew();employeeId='';employeeName='';startedAt=null;employeeIdInput.value='';employeeNameInput.value='';
+    finishPresence();startNew();employeeId='';employeeName='';startedAt=null;employeeIdInput.value='';employeeNameInput.value='';
     resultView.classList.remove('show');questionView.hidden=true;examStatus.hidden=true;startForm.hidden=false;save();window.scrollTo({top:0,behavior:'smooth'});
   });
 
@@ -253,7 +266,7 @@ h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
 
   load();
   employeeIdInput.value=employeeId;employeeNameInput.value=employeeName;
-  if(employeeId&&employeeName&&startedAt){startForm.hidden=true;examStatus.hidden=false;questionView.hidden=false;render()}
+  if(employeeId&&employeeName&&startedAt){startForm.hidden=true;examStatus.hidden=false;questionView.hidden=false;beginPresence();render()}
 })();
 </script>
 </body>
