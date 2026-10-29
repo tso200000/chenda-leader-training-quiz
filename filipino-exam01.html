@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chenda｜Course 1 Formal Exam</title>
+<style>
+:root{--n:#1f3e63;--o:#f39a14;--bg:#f4f7fa;--l:#dbe3ec;--m:#667085;--ok:#237a4b;--bad:#b42318}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Microsoft JhengHei","Noto Sans TC",sans-serif;background:var(--bg);color:#1f2937}
+.top{height:14px;background:var(--n)}
+.wrap{max-width:900px;margin:auto;padding:26px 16px 44px}
+.head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}
+.eyebrow{color:var(--o);font-weight:800;letter-spacing:.08em;font-size:20px}
+h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
+.zh{display:block;margin-top:4px}
+.sub{color:var(--m);margin-top:10px;line-height:1.5;font-size:18px}
+.back{display:inline-block;text-decoration:none;background:#fff;color:var(--n);border:1px solid var(--l);border-radius:12px;padding:11px 15px;font-weight:800;white-space:nowrap}
+.status{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.stat{background:#fff;border:1px solid var(--l);border-radius:14px;padding:13px 16px;font-weight:800;color:var(--n)}
+.progress{height:8px;background:#e7edf4;border-radius:999px;overflow:hidden;margin-top:8px}.progress span{display:block;height:100%;background:var(--o);width:0}
+.card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:28px;box-shadow:0 10px 28px #1f3e6312}
+.qno{font-size:15px;color:var(--o);font-weight:900;letter-spacing:.05em}
+.question{color:var(--n);font-size:25px;font-weight:800;line-height:1.4;margin:10px 0 20px}
+.question .zh{font-size:21px}
+.options{display:grid;gap:12px}
+.option{width:100%;text-align:left;border:1px solid #cbd6e2;background:#fff;border-radius:14px;padding:16px 18px;cursor:pointer;font:inherit;font-size:1.22em;color:#1f2937;line-height:1.45}
+.option:hover{border-color:var(--n);background:#f8fafc}.option.selected{border-color:var(--o);background:#fff8ea}
+.option strong{display:inline-block;width:28px;color:var(--n)}
+.actions{display:flex;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap}
+.btn{border:0;background:var(--n);color:#fff;border-radius:12px;padding:12px 18px;font:inherit;font-weight:900;cursor:pointer}
+.btn.alt{background:#fff;color:var(--n);border:1px solid var(--l)}
+.btn.submit{background:var(--o)}
+.result{display:none}.result.show{display:block}
+.score{text-align:center;font-size:52px;font-weight:900;color:var(--n);margin:8px 0}
+.review-item{padding:16px 0;border-top:1px solid var(--l);line-height:1.5}
+.bad{color:var(--bad)}.ok{color:var(--ok)}
+.note{margin-top:14px;color:var(--m);font-size:14px;line-height:1.5}
+@media(max-width:700px){.head{flex-direction:column}h1{font-size:34px}.status{grid-template-columns:1fr}.card{padding:20px}.question{font-size:22px}.question .zh{font-size:19px}.option{font-size:1.12em;padding:14px}.back{align-self:flex-start}}
+</style>
+</head>
+<body>
+<div class="top"></div>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <div class="eyebrow">COURSE 1 · FORMAL EXAM</div>
+      <h1>Formal Exam<span class="zh">第一堂｜正式考試</span></h1>
+      <div class="sub">25 questions randomly selected from the 60-question bank.<span class="zh">從60題習題庫隨機抽25題；作答中不顯示答案。</span></div>
+    </div>
+    <a class="back" href="filipino-leader-training.html">← Training Center｜培訓中心</a>
+  </div>
+
+  <div class="status">
+    <div class="stat">Progress｜進度：<span id="progressText">1 / 25</span><div class="progress"><span id="progressBar"></span></div></div>
+    <div class="stat">Answered｜已作答：<span id="answeredText">0 / 25</span></div>
+  </div>
+
+  <section class="card" id="examCard">
+    <div id="questionView">
+      <div class="qno" id="qno"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="actions">
+        <button class="btn alt" id="prevButton">Previous｜上一題</button>
+        <button class="btn" id="nextButton">Next｜下一題</button>
+        <button class="btn submit" id="submitButton" hidden>Submit Exam｜交卷</button>
+      </div>
+    </div>
+    <div class="result" id="resultView">
+      <div class="eyebrow">RESULT｜成績</div>
+      <div class="score" id="score"></div>
+      <div id="summary"></div>
+      <div id="review"></div>
+      <div class="actions">
+        <a class="btn alt" href="filipino-leader-training.html" style="text-decoration:none">Back｜返回培訓中心</a>
+        <button class="btn" id="restartButton">New Exam｜重新抽題</button>
+      </div>
+    </div>
+  </section>
+  <div class="note">Formal exam questions come from the same 60-question practice bank, but no answer feedback is shown before submission.<span class="zh">正式考題與習題庫共用同一份60題來源，交卷前不提示正確答案。</span></div>
+</main>
+
+<script src="filipino-practice01-data.js"></script>
+<script>
+(() => {
+  const source = window.COURSE1_PRACTICE || [];
+  const COUNT = 25;
+  const letters = ['A','B','C','D'];
+  const storageKey = 'filipino_course1_formal_v1';
+  let selection = [];
+  let answers = [];
+  let index = 0;
+
+  function shuffledIndexes(n){
+    const a=Array.from({length:n},(_,i)=>i);
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+    return a;
+  }
+  function startNew(){
+    selection = shuffledIndexes(source.length).slice(0, Math.min(COUNT, source.length));
+    answers = Array(selection.length).fill(null);
+    index = 0;
+    save();
+  }
+  function save(){sessionStorage.setItem(storageKey, JSON.stringify({selection,answers,index}))}
+  function load(){
+    try{
+      const x=JSON.parse(sessionStorage.getItem(storageKey)||'null');
+      if(x && Array.isArray(x.selection) && x.selection.length===COUNT && Array.isArray(x.answers) && x.answers.length===COUNT){
+        selection=x.selection;answers=x.answers;index=Math.max(0,Math.min(COUNT-1,Number(x.index)||0));return;
+      }
+    }catch(e){}
+    startNew();
+  }
+
+  const qno=document.getElementById('qno'), question=document.getElementById('question'), options=document.getElementById('options');
+  const progressText=document.getElementById('progressText'), progressBar=document.getElementById('progressBar'), answeredText=document.getElementById('answeredText');
+  const prevButton=document.getElementById('prevButton'), nextButton=document.getElementById('nextButton'), submitButton=document.getElementById('submitButton');
+  const questionView=document.getElementById('questionView'), resultView=document.getElementById('resultView');
+  const scoreEl=document.getElementById('score'), summary=document.getElementById('summary'), review=document.getElementById('review'), restartButton=document.getElementById('restartButton');
+
+  function render(){
+    if(source.length<COUNT){question.innerHTML='Question bank unavailable.<span class="zh">題庫不足25題，無法開始正式考試。</span>';return}
+    const q=source[selection[index]];
+    qno.textContent='Q'+String(index+1).padStart(2,'0')+' / '+COUNT;
+    question.innerHTML=q[1]+'<span class="zh">'+q[2]+'</span>';
+    options.innerHTML='';
+    q[3].forEach((choice,i)=>{
+      const b=document.createElement('button');
+      b.className='option'+(answers[index]===i?' selected':'');
+      b.innerHTML='<strong>'+letters[i]+'.</strong> '+choice[0]+'<span class="zh">'+choice[1]+'</span>';
+      b.addEventListener('click',()=>{answers[index]=i;save();render()});
+      options.appendChild(b);
+    });
+    progressText.textContent=(index+1)+' / '+COUNT;
+    progressBar.style.width=((index+1)/COUNT*100)+'%';
+    answeredText.textContent=answers.filter(v=>v!==null).length+' / '+COUNT;
+    prevButton.disabled=index===0;
+    nextButton.hidden=index===COUNT-1;
+    submitButton.hidden=index!==COUNT-1;
+  }
+  prevButton.addEventListener('click',()=>{if(index>0){index--;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
+  nextButton.addEventListener('click',()=>{if(index<COUNT-1){index++;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
+  submitButton.addEventListener('click',()=>{
+    const missing=answers.filter(v=>v===null).length;
+    if(missing && !confirm('Still '+missing+' unanswered. Submit anyway?\n尚有 '+missing+' 題未作答，仍要交卷嗎？')) return;
+    const qs=selection.map(i=>source[i]);
+    const correct=qs.reduce((n,q,i)=>n+(answers[i]===q[4]?1:0),0);
+    const pct=Math.round(correct/COUNT*100);
+    scoreEl.textContent=pct+' / 100';
+    summary.innerHTML='<p><strong>Correct｜答對：</strong>'+correct+' / '+COUNT+'</p>';
+    review.innerHTML='<h2>Review｜錯題檢視</h2>';
+    qs.forEach((q,i)=>{
+      if(answers[i]!==q[4]){
+        const your=answers[i]===null?'Unanswered｜未作答':letters[answers[i]]+'. '+q[3][answers[i]][0]+' / '+q[3][answers[i]][1];
+        review.innerHTML+='<div class="review-item"><strong>Q'+(i+1)+'. '+q[1]+'</strong><span class="zh">'+q[2]+'</span><div class="bad">Your answer｜你的答案：'+your+'</div><div class="ok">Correct｜正確答案：'+letters[q[4]]+'. '+q[3][q[4]][0]+' / '+q[3][q[4]][1]+'</div></div>';
+      }
+    });
+    questionView.style.display='none';resultView.classList.add('show');sessionStorage.removeItem(storageKey);window.scrollTo({top:0,behavior:'smooth'});
+  });
+  restartButton.addEventListener('click',()=>{startNew();resultView.classList.remove('show');questionView.style.display='block';render();window.scrollTo({top:0,behavior:'smooth'})});
+  load(); render();
+})();
+</script>
+</body>
+</html>
