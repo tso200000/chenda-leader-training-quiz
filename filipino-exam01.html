@@ -90,8 +90,10 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
     window.location.replace('filipino-leader-training.html');
     return;
   }
+  const API="https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec";
   const EMPLOYEE_NAME_MAP={};
   function lookupName(id){return EMPLOYEE_NAME_MAP[String(id||'').trim()]||''}
+  function localDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
   const source = window.COURSE1_PRACTICE || [];
   const COUNT = 25;
   const letters = ['A','B','C','D'];
