@@ -71,7 +71,7 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
       <div class="eyebrow">RESULT｜成績</div>
       <div class="score" id="score"></div>
       <div id="summary"></div>
-      <div id="review"></div>
+      <div id="review"></div><div class="note" id="cloudStatus"></div>
       <div class="actions">
         <a class="btn alt" href="filipino-leader-training.html" style="text-decoration:none">Back｜返回培訓中心</a>
         <button class="btn" id="restartButton">New Exam｜重新抽題</button>
@@ -132,7 +132,7 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
   const progressText=document.getElementById('progressText'), progressBar=document.getElementById('progressBar'), answeredText=document.getElementById('answeredText');
   const prevButton=document.getElementById('prevButton'), nextButton=document.getElementById('nextButton'), submitButton=document.getElementById('submitButton');
   const questionView=document.getElementById('questionView'), resultView=document.getElementById('resultView');
-  const scoreEl=document.getElementById('score'), summary=document.getElementById('summary'), review=document.getElementById('review'), restartButton=document.getElementById('restartButton');
+  const scoreEl=document.getElementById('score'), summary=document.getElementById('summary'), review=document.getElementById('review'), cloudStatus=document.getElementById('cloudStatus'), restartButton=document.getElementById('restartButton');
 
   employeeIdInput.addEventListener('input',()=>{employeeId=employeeIdInput.value.trim();employeeName=lookupName(employeeId);employeeNameInput.value=employeeName;save()});
   startExamButton.addEventListener('click',()=>{employeeId=employeeIdInput.value.trim();if(!employeeId){alert('Please enter Employee ID.｜請輸入工號。');return}employeeName=lookupName(employeeId);employeeNameInput.value=employeeName;startedAt=new Date().toISOString();startForm.hidden=true;examStatus.hidden=false;questionView.hidden=false;save();render()});
