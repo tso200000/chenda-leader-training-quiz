@@ -154,16 +154,58 @@ h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
   const COUNT = QUESTIONS.length;
   const letters = ['A','B','C','D'];
   const storageKey = 'leader_final_exam_v1';
-  const presenceKey = 'leader_final_exam_presence_v1';
-  let presenceTimer = null;
-  function presenceDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
-  function updatePresence(state='active'){
-    if(!employeeId||!employeeName)return;
-    let all={};try{all=JSON.parse(localStorage.getItem(presenceKey)||'{}')||{}}catch(e){}
-    const prev=all[employeeId]||{};
-    all[employeeId]={code:employeeId,name:employeeName,question:index+1,total:40,state,lastSeen:Date.now(),startedAt:prev.startedAt||Date.now(),examDate:presenceDate()};
-    localStorage.setItem(presenceKey,JSON.stringify(all));
-  }
+ const presenceKey = 'leader_final_exam_presence_v1';
+const presenceApi = 'https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec';
+
+let presenceTimer = null;
+
+function presenceDate(){
+  return new Intl.DateTimeFormat('en-CA',{
+    timeZone:'Asia/Taipei',
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit'
+  }).format(new Date());
+}
+
+function updatePresence(state='active'){
+  if(!employeeId || !employeeName) return;
+
+  const row = {
+    code: employeeId,
+    name: employeeName,
+    question: index + 1,
+    total: 40,
+    state: state,
+    lastSeen: Date.now(),
+    startedAt: startedAt || '',
+    examDate: presenceDate()
+  };
+
+  // 同裝置備援
+  try{
+    let all = JSON.parse(localStorage.getItem(presenceKey) || '{}') || {};
+    all[employeeId] = row;
+    localStorage.setItem(presenceKey, JSON.stringify(all));
+  }catch(e){}
+
+  // 跨手機共用心跳
+  fetch(presenceApi,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({
+      action:'examPresenceUpdate',
+      examId:'FINAL40',
+      code:row.code,
+      name:row.name,
+      question:row.question,
+      total:row.total,
+      state:row.state,
+      startedAt:row.startedAt,
+      examDate:row.examDate
+    })
+  }).catch(function(){});
+}
   function beginPresence(){if(presenceTimer)clearInterval(presenceTimer);updatePresence('active');presenceTimer=setInterval(()=>updatePresence('active'),5000)}
   function finishPresence(){if(presenceTimer){clearInterval(presenceTimer);presenceTimer=null}updatePresence('finished')}
   let orderMaps = [];
