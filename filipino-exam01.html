@@ -158,14 +158,14 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
   }
   prevButton.addEventListener('click',()=>{if(index>0){index--;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
   nextButton.addEventListener('click',()=>{if(index<COUNT-1){index++;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
-  submitButton.addEventListener('click',()=>{
+  submitButton.addEventListener('click',async()=>{
     const missing=answers.filter(v=>v===null).length;
     if(missing && !confirm('Still '+missing+' unanswered. Submit anyway?\n尚有 '+missing+' 題未作答，仍要交卷嗎？')) return;
     const qs=selection.map(i=>source[i]);
     const correct=qs.reduce((n,q,i)=>n+(answers[i]===q[4]?1:0),0);
     const pct=Math.round(correct/COUNT*100);
     scoreEl.textContent=pct+' / 100';
-    summary.innerHTML='<p><strong>Correct｜答對：</strong>'+correct+' / '+COUNT+'</p>';
+    const examDate=localDate();summary.innerHTML='<p><strong>Employee ID｜工號：</strong>'+employeeId+(employeeName?'　<strong>Name｜姓名：</strong>'+employeeName:'')+'</p><p><strong>Exam Date｜考試日期：</strong>'+examDate+'　<strong>Correct｜答對：</strong>'+correct+' / '+COUNT+'</p>';
     review.innerHTML='<h2>Review｜錯題檢視</h2>';
     qs.forEach((q,i)=>{
       if(answers[i]!==q[4]){
