@@ -90,6 +90,8 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
     window.location.replace('filipino-leader-training.html');
     return;
   }
+  const EMPLOYEE_NAME_MAP={};
+  function lookupName(id){return EMPLOYEE_NAME_MAP[String(id||'').trim()]||''}
   const source = window.COURSE1_PRACTICE || [];
   const COUNT = 25;
   const letters = ['A','B','C','D'];
@@ -97,6 +99,9 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
   let selection = [];
   let answers = [];
   let index = 0;
+  let employeeId='';
+  let employeeName='';
+  let startedAt=null;
 
   function shuffledIndexes(n){
     const a=Array.from({length:n},(_,i)=>i);
@@ -109,23 +114,26 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
     index = 0;
     save();
   }
-  function save(){sessionStorage.setItem(storageKey, JSON.stringify({selection,answers,index}))}
+  function save(){sessionStorage.setItem(storageKey, JSON.stringify({selection,answers,index,employeeId,employeeName,startedAt}))}
   function load(){
     try{
       const x=JSON.parse(sessionStorage.getItem(storageKey)||'null');
       if(x && Array.isArray(x.selection) && x.selection.length===COUNT && Array.isArray(x.answers) && x.answers.length===COUNT){
-        selection=x.selection;answers=x.answers;index=Math.max(0,Math.min(COUNT-1,Number(x.index)||0));return;
+        selection=x.selection;answers=x.answers;index=Math.max(0,Math.min(COUNT-1,Number(x.index)||0));employeeId=String(x.employeeId||'');employeeName=String(x.employeeName||'');startedAt=x.startedAt||null;return;
       }
     }catch(e){}
     startNew();
   }
 
+  const startForm=document.getElementById('startForm'), examStatus=document.getElementById('examStatus'), employeeIdInput=document.getElementById('employeeId'), employeeNameInput=document.getElementById('employeeName'), startExamButton=document.getElementById('startExamButton');
   const qno=document.getElementById('qno'), question=document.getElementById('question'), options=document.getElementById('options');
   const progressText=document.getElementById('progressText'), progressBar=document.getElementById('progressBar'), answeredText=document.getElementById('answeredText');
   const prevButton=document.getElementById('prevButton'), nextButton=document.getElementById('nextButton'), submitButton=document.getElementById('submitButton');
   const questionView=document.getElementById('questionView'), resultView=document.getElementById('resultView');
   const scoreEl=document.getElementById('score'), summary=document.getElementById('summary'), review=document.getElementById('review'), restartButton=document.getElementById('restartButton');
 
+  employeeIdInput.addEventListener('input',()=>{employeeId=employeeIdInput.value.trim();employeeName=lookupName(employeeId);employeeNameInput.value=employeeName;save()});
+  startExamButton.addEventListener('click',()=>{employeeId=employeeIdInput.value.trim();if(!employeeId){alert('Please enter Employee ID.｜請輸入工號。');return}employeeName=lookupName(employeeId);employeeNameInput.value=employeeName;startedAt=new Date().toISOString();startForm.hidden=true;examStatus.hidden=false;questionView.hidden=false;save();render()});
   function render(){
     if(source.length<COUNT){question.innerHTML='Question bank unavailable.<span class="zh">題庫不足25題，無法開始正式考試。</span>';return}
     const q=source[selection[index]];
@@ -165,8 +173,8 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
     });
     questionView.style.display='none';resultView.classList.add('show');sessionStorage.removeItem(storageKey);window.scrollTo({top:0,behavior:'smooth'});
   });
-  restartButton.addEventListener('click',()=>{startNew();resultView.classList.remove('show');questionView.style.display='block';render();window.scrollTo({top:0,behavior:'smooth'})});
-  load(); render();
+  restartButton.addEventListener('click',()=>{startNew();employeeId='';employeeName='';startedAt=null;employeeIdInput.value='';employeeNameInput.value='';resultView.classList.remove('show');questionView.hidden=true;examStatus.hidden=true;startForm.hidden=false;save();window.scrollTo({top:0,behavior:'smooth'})});
+  load();employeeIdInput.value=employeeId;employeeNameInput.value=lookupName(employeeId);employeeName=employeeNameInput.value;if(employeeId&&startedAt){startForm.hidden=true;examStatus.hidden=false;questionView.hidden=false;render()}
 })();
 </script>
 </body>
