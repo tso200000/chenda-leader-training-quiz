@@ -19,7 +19,7 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
 .status{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
 .stat{background:#fff;border:1px solid var(--l);border-radius:14px;padding:13px 16px;font-weight:800;color:var(--n)}
 .progress{height:8px;background:#e7edf4;border-radius:999px;overflow:hidden;margin-top:8px}.progress span{display:block;height:100%;background:var(--o);width:0}
-.card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:28px;box-shadow:0 10px 28px #1f3e6312}
+.card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:28px;box-shadow:0 10px 28px #1f3e6312}.register-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}.register-grid label{font-weight:800;color:var(--n)}.register-grid input{width:100%;margin-top:6px;padding:13px 14px;border:1px solid var(--l);border-radius:11px;font:inherit;font-size:18px}.register-grid input[readonly]{background:#f8fafc;color:#475467}
 .qno{font-size:15px;color:var(--o);font-weight:900;letter-spacing:.05em}
 .question{color:var(--n);font-size:38px;font-weight:800;line-height:1.4;margin:10px 0 20px}
 .question .zh{font-size:32px}
@@ -51,13 +51,13 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
     <a class="back" href="filipino-leader-training.html">← Training Center｜培訓中心</a>
   </div>
 
-  <div class="status">
+  <div class="status" id="examStatus" hidden>
     <div class="stat">Progress｜進度：<span id="progressText">1 / 25</span><div class="progress"><span id="progressBar"></span></div></div>
     <div class="stat">Answered｜已作答：<span id="answeredText">0 / 25</span></div>
   </div>
 
-  <section class="card" id="examCard"><div id="startForm"><h2>Exam Registration<span class="zh">考試登記</span></h2><div><label>Employee ID<span class="zh">工號</span><input id="employeeId"></label><label>Name<span class="zh">姓名</span><input id="employeeName" readonly></label></div><button class="btn" id="startExamButton">Start Exam｜開始測驗</button></div>
-    <div id="questionView">
+  <section class="card" id="examCard"><div id="startForm"><h2>Exam Registration<span class="zh">考試登記</span></h2><div class="register-grid"><label>Employee ID<span class="zh">工號</span><input id="employeeId" autocomplete="off" placeholder="Employee ID｜工號"></label><label>Name<span class="zh">姓名</span><input id="employeeName" readonly placeholder="Auto-fill when matched｜符合名單時自動帶入"></label></div><button class="btn" id="startExamButton">Start Exam｜開始測驗</button></div>
+    <div id="questionView" hidden>
       <div class="qno" id="qno"></div>
       <div class="question" id="question"></div>
       <div class="options" id="options"></div>
