@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chenda｜Course 1 Practice Question Bank</title>
+<style>
+:root{--n:#1f3e63;--o:#f39a14;--bg:#f4f7fa;--l:#dbe3ec;--m:#667085;--ok:#237a4b;--bad:#b42318}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Microsoft JhengHei","Noto Sans TC",sans-serif;background:var(--bg);color:#1f2937}
+.top{height:14px;background:var(--n)}
+.wrap{max-width:900px;margin:auto;padding:26px 16px 44px}
+.head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:18px}
+.eyebrow{color:var(--o);font-weight:800;letter-spacing:.08em}
+h1{margin:7px 0 0;color:var(--n);font-size:34px;line-height:1.2}
+.zh{display:block;margin-top:4px}
+.sub{color:var(--m);margin-top:8px;line-height:1.5}
+.back{display:inline-block;text-decoration:none;background:#fff;color:var(--n);border:1px solid var(--l);border-radius:12px;padding:11px 15px;font-weight:800;white-space:nowrap}
+.status{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.stat{background:#fff;border:1px solid var(--l);border-radius:14px;padding:13px 16px;font-weight:800;color:var(--n)}
+.progress{height:8px;background:#e7edf4;border-radius:999px;overflow:hidden;margin-top:8px}.progress span{display:block;height:100%;background:var(--o);width:0}
+.card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:28px;box-shadow:0 10px 28px #1f3e6312}
+.qno{font-size:15px;color:var(--o);font-weight:900;letter-spacing:.05em}
+.question{color:var(--n);font-size:25px;font-weight:800;line-height:1.4;margin:10px 0 20px}
+.question .zh{font-size:21px}
+.options{display:grid;gap:12px}
+.option{width:100%;text-align:left;border:1px solid #cbd6e2;background:#fff;border-radius:14px;padding:14px 16px;cursor:pointer;font:inherit;color:#1f2937;line-height:1.45}
+.option:hover:not(:disabled){border-color:var(--n);background:#f8fafc}
+.option:disabled{cursor:default}
+.option strong{display:inline-block;width:28px;color:var(--n)}
+.option.correct{border-color:#77b993;background:#edf8f1}
+.option.wrong{border-color:#e5a49d;background:#fff1ef}
+.feedback{display:none;margin-top:20px;border-radius:14px;padding:16px 18px;line-height:1.55}
+.feedback.show{display:block}.feedback.ok{background:#edf8f1;border:1px solid #9bc9ad;color:#185c38}.feedback.bad{background:#fff4f2;border:1px solid #e5b0aa;color:#7a271a}
+.feedback-title{font-size:20px;font-weight:900;margin-bottom:6px}
+.answer-line{font-weight:800;margin-top:8px}
+.why{margin-top:10px;padding-top:10px;border-top:1px solid currentColor}
+.actions{display:flex;justify-content:flex-end;margin-top:18px}
+.next,.restart{border:0;background:var(--n);color:#fff;border-radius:12px;padding:12px 18px;font:inherit;font-weight:900;cursor:pointer}
+.next[hidden]{display:none}
+.finish{text-align:center;padding:16px 0}.finish h2{color:var(--n);font-size:30px}.finish p{font-size:19px;line-height:1.6}
+.note{margin-top:14px;color:var(--m);font-size:14px;line-height:1.5}
+@media(max-width:700px){.head{flex-direction:column}.status{grid-template-columns:1fr}.card{padding:20px}.question{font-size:22px}.question .zh{font-size:19px}.option{padding:13px}.back{align-self:flex-start}}
+</style>
+</head>
+<body>
+<div class="top"></div>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <div class="eyebrow">COURSE 1 · OPEN BOOK PRACTICE</div>
+      <h1>Practice Question Bank<span class="zh">第一堂｜習題庫</span></h1>
+      <div class="sub">60 Questions · Immediate feedback · Practice only<span class="zh">60題｜即時回饋｜本區為練習，不列正式成績</span></div>
+    </div>
+    <a class="back" href="filipino-leader-training.html">← Training Center｜培訓中心</a>
+  </div>
+
+  <div class="status">
+    <div class="stat">Progress｜進度：<span id="progressText">1 / 60</span><div class="progress"><span id="progressBar"></span></div></div>
+    <div class="stat">Correct｜答對：<span id="correctText">0</span></div>
+  </div>
+
+  <section class="card" id="practiceCard">
+    <div id="questionView">
+      <div class="qno" id="qno"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="actions"><button class="next" id="nextButton" hidden>Next Question｜下一題</button></div>
+    </div>
+    <div class="finish" id="finishView" hidden>
+      <h2>Practice Complete<span class="zh">練習完成</span></h2>
+      <p id="finalScore"></p>
+      <button class="restart" id="restartButton">Practice Again｜重新練習</button>
+    </div>
+  </section>
+  <div class="note">Choose one answer. After you answer, this question is locked. If your answer is wrong, the correct answer and explanation will appear immediately.<span class="zh">每題選擇一次後即鎖定；若答錯，會立即顯示正確答案與原因說明。</span></div>
+</main>
+
+<script src="filipino-practice01-data.js"></script>
+<script>
+(() => {
+  const questions = window.COURSE1_PRACTICE || [];
+  const qno = document.getElementById('qno');
+  const question = document.getElementById('question');
+  const options = document.getElementById('options');
+  const feedback = document.getElementById('feedback');
+  const nextButton = document.getElementById('nextButton');
+  const progressText = document.getElementById('progressText');
+  const progressBar = document.getElementById('progressBar');
+  const correctText = document.getElementById('correctText');
+  const questionView = document.getElementById('questionView');
+  const finishView = document.getElementById('finishView');
+  const finalScore = document.getElementById('finalScore');
+  const restartButton = document.getElementById('restartButton');
+  const letters = ['A','B','C','D'];
+  let index = 0, correct = 0, locked = false;
+
+  function render() {
+    if (!questions.length) {
+      question.innerHTML = 'Question bank unavailable.<span class="zh">題庫資料無法載入。</span>';
+      return;
+    }
+    const q = questions[index];
+    locked = false;
+    qno.textContent = 'Q' + String(q[0]).padStart(2,'0') + ' / ' + questions.length;
+    question.innerHTML = q[1] + '<span class="zh">' + q[2] + '</span>';
+    progressText.textContent = (index + 1) + ' / ' + questions.length;
+    progressBar.style.width = ((index + 1) / questions.length * 100) + '%';
+    correctText.textContent = correct;
+    feedback.className = 'feedback';
+    feedback.innerHTML = '';
+    nextButton.hidden = true;
+    options.innerHTML = '';
+    q[3].forEach((choice, i) => {
+      const b = document.createElement('button');
+      b.className = 'option';
+      b.innerHTML = '<strong>' + letters[i] + '.</strong> ' + choice[0] + '<span class="zh">' + choice[1] + '</span>';
+      b.addEventListener('click', () => answer(i));
+      options.appendChild(b);
+    });
+  }
+
+  function answer(selected) {
+    if (locked) return;
+    locked = true;
+    const q = questions[index], answer = q[4];
+    const buttons = [...options.querySelectorAll('.option')];
+    buttons.forEach((b,i) => {
+      b.disabled = true;
+      if (i === answer) b.classList.add('correct');
+      if (i === selected && selected !== answer) b.classList.add('wrong');
+    });
+    const right = selected === answer;
+    if (right) {
+      correct++;
+      correctText.textContent = correct;
+      feedback.className = 'feedback show ok';
+      feedback.innerHTML = '<div class="feedback-title">✓ Correct｜答對了</div><div class="answer-line">' + letters[answer] + '. ' + q[3][answer][0] + '<span class="zh">' + q[3][answer][1] + '</span></div>';
+    } else {
+      feedback.className = 'feedback show bad';
+      feedback.innerHTML = '<div class="feedback-title">✕ Not quite｜答錯了</div><div class="answer-line">Correct Answer｜正確答案：' + letters[answer] + '. ' + q[3][answer][0] + '<span class="zh">' + q[3][answer][1] + '</span></div><div class="why"><strong>Why｜為什麼？</strong><br>' + q[5] + '<span class="zh">' + q[6] + '</span></div>';
+    }
+    nextButton.textContent = index === questions.length - 1 ? 'See Result｜查看結果' : 'Next Question｜下一題';
+    nextButton.hidden = false;
+  }
+
+  function next() {
+    if (!locked) return;
+    if (index < questions.length - 1) {
+      index++;
+      render();
+      window.scrollTo({top:0,behavior:'smooth'});
+    } else {
+      questionView.hidden = true;
+      finishView.hidden = false;
+      progressText.textContent = questions.length + ' / ' + questions.length;
+      progressBar.style.width = '100%';
+      finalScore.innerHTML = 'Correct：<strong>' + correct + ' / ' + questions.length + '</strong><span class="zh">答對：<strong>' + correct + ' / ' + questions.length + '</strong></span>';
+    }
+  }
+
+  nextButton.addEventListener('click', next);
+  restartButton.addEventListener('click', () => {
+    index = 0; correct = 0; locked = false;
+    finishView.hidden = true; questionView.hidden = false;
+    render(); window.scrollTo({top:0,behavior:'smooth'});
+  });
+  render();
+})();
+</script>
+</body>
+</html>
