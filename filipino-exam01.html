@@ -21,10 +21,10 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
 .progress{height:8px;background:#e7edf4;border-radius:999px;overflow:hidden;margin-top:8px}.progress span{display:block;height:100%;background:var(--o);width:0}
 .card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:28px;box-shadow:0 10px 28px #1f3e6312}
 .qno{font-size:15px;color:var(--o);font-weight:900;letter-spacing:.05em}
-.question{color:var(--n);font-size:25px;font-weight:800;line-height:1.4;margin:10px 0 20px}
-.question .zh{font-size:21px}
+.question{color:var(--n);font-size:38px;font-weight:800;line-height:1.4;margin:10px 0 20px}
+.question .zh{font-size:32px}
 .options{display:grid;gap:12px}
-.option{width:100%;text-align:left;border:1px solid #cbd6e2;background:#fff;border-radius:14px;padding:16px 18px;cursor:pointer;font:inherit;font-size:1.22em;color:#1f2937;line-height:1.45}
+.option{width:100%;text-align:left;border:1px solid #cbd6e2;background:#fff;border-radius:14px;padding:18px 20px;cursor:pointer;font:inherit;font-size:1.8em;color:#1f2937;line-height:1.45}
 .option:hover{border-color:var(--n);background:#f8fafc}.option.selected{border-color:var(--o);background:#fff8ea}
 .option strong{display:inline-block;width:28px;color:var(--n)}
 .actions{display:flex;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap}
@@ -36,7 +36,7 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
 .review-item{padding:16px 0;border-top:1px solid var(--l);line-height:1.5}
 .bad{color:var(--bad)}.ok{color:var(--ok)}
 .note{margin-top:14px;color:var(--m);font-size:14px;line-height:1.5}
-@media(max-width:700px){.head{flex-direction:column}h1{font-size:34px}.status{grid-template-columns:1fr}.card{padding:20px}.question{font-size:22px}.question .zh{font-size:19px}.option{font-size:1.12em;padding:14px}.back{align-self:flex-start}}
+@media(max-width:700px){.head{flex-direction:column}h1{font-size:34px}.status{grid-template-columns:1fr}.card{padding:20px}.question{font-size:33px}.question .zh{font-size:29px}.option{font-size:1.68em;padding:16px}.back{align-self:flex-start}}
 </style>
 </head>
 <body>
@@ -84,6 +84,12 @@ h1{margin:7px 0 0;color:var(--n);font-size:40px;line-height:1.2}
 <script src="filipino-practice01-data.js"></script>
 <script>
 (() => {
+  const enteredPassword = window.prompt('Formal Exam Password｜請輸入正式考試密碼');
+  if (enteredPassword !== '9876') {
+    window.alert('Incorrect password｜密碼錯誤');
+    window.location.replace('filipino-leader-training.html');
+    return;
+  }
   const source = window.COURSE1_PRACTICE || [];
   const COUNT = 25;
   const letters = ['A','B','C','D'];
