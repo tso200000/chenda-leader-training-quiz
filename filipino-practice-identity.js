@@ -51,6 +51,16 @@
       return result;
     }
 
+    async function validateCurrentIdentity(){
+      const result = await post({action:'practiceIdentity', deviceToken:getDeviceToken()});
+      if (result && result.ok) {
+        setCachedIdentity(result);
+        return result;
+      }
+      clearCachedIdentity();
+      return result || {ok:false};
+    }
+
     function setCachedIdentity(identity){
       const clean = {
         employeeId:String(identity.employeeId || ''),
@@ -73,7 +83,7 @@
 
     function clearCachedIdentity(){ storage.removeItem(IDENTITY_KEY); }
 
-    return {getDeviceToken, lookupEmployee, register, setCachedIdentity, getCurrentIdentity, clearCachedIdentity};
+    return {getDeviceToken, lookupEmployee, register, validateCurrentIdentity, setCachedIdentity, getCurrentIdentity, clearCachedIdentity};
   }
 
   return {createPracticeIdentity};
