@@ -39,3 +39,12 @@ test('管理中心匯出包含姓名並把總會考納入統計', () => {
   assert.match(html, /FINAL40/);
   assert.match(html, /8\/8/);
 });
+
+
+test('總會考選項順序固定並與紙本一致，不再隨機洗牌', () => {
+  const html = fs.readFileSync(path.join(root, 'leader-final-exam.html'), 'utf8');
+  assert.doesNotMatch(html, /function\s+shuffledIndexes/);
+  assert.doesNotMatch(html, /Math\.random\(\)/);
+  assert.match(html, /答案選項順序固定/);
+  assert.match(html, /orderMaps\s*=\s*QUESTIONS\.map\(q=>Array\.from\(\{length:q\.c\.length\},\(_,i\)=>i\)\)/);
+});
