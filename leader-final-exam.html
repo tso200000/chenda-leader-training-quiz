@@ -54,7 +54,7 @@ h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
     <div>
       <div class="eyebrow">FINAL EXAM｜正式考試</div>
       <h1>總會考｜1～8堂綜合測驗</h1>
-      <div class="sub">40題｜每題2.5分｜滿分100分<br>考題固定，答案選項每次考試重新排列；交卷前不顯示答案。</div>
+      <div class="sub">40題｜每題2.5分｜滿分100分<br>考題固定，答案選項順序固定；交卷前不顯示答案。</div>
     </div>
     <a class="back" href="leader-training.html">← 培訓中心</a>
   </div>
@@ -216,13 +216,11 @@ function updatePresence(state='active'){
   let employeeName = '';
   let startedAt = null;
 
-  function shuffledIndexes(n){
-    const a=Array.from({length:n},(_,i)=>i);
-    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
-    return a;
+  function fixedOrderMaps(){
+    return QUESTIONS.map(q=>Array.from({length:q.c.length},(_,i)=>i));
   }
   function startNew(){
-    orderMaps = QUESTIONS.map(q=>shuffledIndexes(q.c.length));
+    orderMaps = fixedOrderMaps();
     answers = Array(COUNT).fill(null);
     index = 0;
     save();
@@ -231,8 +229,15 @@ function updatePresence(state='active'){
   function load(){
     try{
       const x=JSON.parse(sessionStorage.getItem(storageKey)||'null');
-      if(x && Array.isArray(x.orderMaps) && x.orderMaps.length===COUNT && Array.isArray(x.answers) && x.answers.length===COUNT){
-        orderMaps=x.orderMaps;answers=x.answers;index=Math.max(0,Math.min(COUNT-1,Number(x.index)||0));employeeId=String(x.employeeId||'');employeeName=String(x.employeeName||'');startedAt=x.startedAt||null;return;
+      if(x && Array.isArray(x.answers) && x.answers.length===COUNT){
+        orderMaps=fixedOrderMaps();
+        answers=x.answers;
+        index=Math.max(0,Math.min(COUNT-1,Number(x.index)||0));
+        employeeId=String(x.employeeId||'');
+        employeeName=String(x.employeeName||'');
+        startedAt=x.startedAt||null;
+        save();
+        return;
       }
     }catch(e){}
     startNew();
