@@ -138,7 +138,105 @@ h1{margin:7px 0 0;color:var(--n);font-size:48px;line-height:1.2}
   const finalScore = document.getElementById('finalScore');
   const restartButton = document.getElementById('restartButton');
   const letters = ['A','B','C','D'];
-  let index = 0, correct = 0, locked = false;
+  const COURSE_ID = 'FILIPINO_C01';
+  const PRACTICE_API = 'https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec';
+  const progressKey = 'filipino_practice_progress_' + COURSE_ID + '_' + learnerIdentity.employeeId;
+  let index = 0, correct = 0, locked = false, practiceRoundId = '';
+
+  function createRoundId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+    return 'round-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+  }
+
+  function newPracticeRound() {
+    index = 0;
+    correct = 0;
+    locked = false;
+    practiceRoundId = createRoundId();
+    const progress = {
+      version: 1,
+      employeeId: learnerIdentity.employeeId,
+      courseId: COURSE_ID,
+      nextIndex: 0,
+      correct: 0,
+      practiceRoundId: practiceRoundId,
+      completed: false
+    };
+    localStorage.setItem(progressKey, JSON.stringify(progress));
+    return progress;
+  }
+
+  function loadPracticeProgress() {
+    try {
+      const raw = localStorage.getItem(progressKey);
+      if (!raw) return newPracticeRound();
+      const progress = JSON.parse(raw);
+      if (!progress || progress.employeeId !== learnerIdentity.employeeId || progress.courseId !== COURSE_ID || !progress.practiceRoundId) {
+        return newPracticeRound();
+      }
+      return progress;
+    } catch (_) {
+      return newPracticeRound();
+    }
+  }
+
+  function savePracticeProgress(overrides = {}) {
+    const progress = {
+      version: 1,
+      employeeId: learnerIdentity.employeeId,
+      courseId: COURSE_ID,
+      nextIndex: overrides.nextIndex !== undefined ? overrides.nextIndex : index,
+      correct: correct,
+      practiceRoundId: practiceRoundId,
+      completed: overrides.completed === true
+    };
+    localStorage.setItem(progressKey, JSON.stringify(progress));
+    return progress;
+  }
+
+  function sendPracticeEvent(event) {
+    const payload = Object.assign({action:'practiceEvent'}, event);
+    fetch(PRACTICE_API, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    }).catch(() => {});
+  }
+
+  function recordAnswerEvent(q, right) {
+    sendPracticeEvent({
+      eventId: practiceRoundId + ':ANSWER:' + q[0],
+      employeeId: learnerIdentity.employeeId,
+      courseId: COURSE_ID,
+      eventType: 'ANSWER',
+      questionNo: q[0],
+      isCorrect: right,
+      occurredAt: new Date().toISOString(),
+      practiceRoundId: practiceRoundId
+    });
+  }
+
+  function recordRoundCompleteEvent() {
+    sendPracticeEvent({
+      eventId: practiceRoundId + ':ROUND_COMPLETE',
+      employeeId: learnerIdentity.employeeId,
+      courseId: COURSE_ID,
+      eventType: 'ROUND_COMPLETE',
+      questionNo: null,
+      isCorrect: null,
+      occurredAt: new Date().toISOString(),
+      practiceRoundId: practiceRoundId
+    });
+  }
+
+  function showCompletedRound() {
+    questionView.hidden = true;
+    finishView.hidden = false;
+    progressText.textContent = questions.length + ' / ' + questions.length;
+    progressBar.style.width = '100%';
+    correctText.textContent = correct;
+    finalScore.innerHTML = 'Correct：<strong>' + correct + ' / ' + questions.length + '</strong><span class="zh">答對：<strong>' + correct + ' / ' + questions.length + '</strong></span>';
+  }
 
   function render() {
     if (!questions.length) {
@@ -185,6 +283,10 @@ h1{margin:7px 0 0;color:var(--n);font-size:48px;line-height:1.2}
       feedback.className = 'feedback show bad';
       feedback.innerHTML = '<div class="feedback-title">✕ Not quite｜答錯了</div><div class="answer-line">Correct Answer｜正確答案：' + letters[answer] + '. ' + q[3][answer][0] + '<span class="zh">' + q[3][answer][1] + '</span></div><div class="why"><strong>Why｜為什麼？</strong><br>' + q[5] + '<span class="zh">' + q[6] + '</span></div>';
     }
+    const completed = index + 1 >= questions.length;
+    savePracticeProgress({nextIndex: index + 1, completed: completed});
+    recordAnswerEvent(q, right);
+    if (completed) recordRoundCompleteEvent();
     nextButton.textContent = index === questions.length - 1 ? 'See Result｜查看結果' : 'Next Question｜下一題';
     nextButton.hidden = false;
   }
@@ -196,21 +298,26 @@ h1{margin:7px 0 0;color:var(--n);font-size:48px;line-height:1.2}
       render();
       window.scrollTo({top:0,behavior:'smooth'});
     } else {
-      questionView.hidden = true;
-      finishView.hidden = false;
-      progressText.textContent = questions.length + ' / ' + questions.length;
-      progressBar.style.width = '100%';
-      finalScore.innerHTML = 'Correct：<strong>' + correct + ' / ' + questions.length + '</strong><span class="zh">答對：<strong>' + correct + ' / ' + questions.length + '</strong></span>';
+      showCompletedRound();
     }
   }
 
   nextButton.addEventListener('click', next);
   restartButton.addEventListener('click', () => {
-    index = 0; correct = 0; locked = false;
+    newPracticeRound();
     finishView.hidden = true; questionView.hidden = false;
     render(); window.scrollTo({top:0,behavior:'smooth'});
   });
-  render();
+
+  const progress = loadPracticeProgress();
+  practiceRoundId = progress.practiceRoundId;
+  correct = Math.max(0, Number(progress.correct) || 0);
+  if (progress.completed || Number(progress.nextIndex) >= questions.length) {
+    showCompletedRound();
+  } else {
+    index = Math.min(questions.length - 1, Math.max(0, Number(progress.nextIndex) || 0));
+    render();
+  }
 })();
 </script>
 </body>
