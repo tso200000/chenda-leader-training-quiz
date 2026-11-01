@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chenda｜Practice Registration</title>
+<style>
+:root{--n:#1f3e63;--o:#f39a14;--bg:#f4f7fa;--l:#dbe3ec;--m:#667085;--ok:#237a4b;--bad:#b42318}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Microsoft JhengHei","Noto Sans TC",sans-serif;background:var(--bg);color:#1f2937}
+.top{height:14px;background:var(--n)}
+.wrap{max-width:760px;margin:auto;padding:28px 16px 48px}
+.head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:20px}
+.eyebrow{color:var(--o);font-weight:800;letter-spacing:.08em;font-size:22px}
+h1{margin:7px 0 0;color:var(--n);font-size:42px;line-height:1.18}
+.zh{display:block;margin-top:4px}
+.sub{color:var(--m);margin-top:10px;line-height:1.55;font-size:19px}
+.back{display:inline-block;text-decoration:none;background:#fff;color:var(--n);border:1px solid var(--l);border-radius:12px;padding:11px 15px;font-weight:800;white-space:nowrap}
+.card{background:#fff;border:1px solid var(--l);border-radius:20px;padding:28px;box-shadow:0 10px 28px #1f3e6312}
+.field{display:block;margin:0 0 18px;font-weight:900;color:var(--n);font-size:18px}
+.field .zh{font-weight:700;color:var(--m);font-size:15px}
+input{width:100%;margin-top:8px;padding:14px 15px;border:1px solid #cbd6e2;border-radius:12px;font:inherit;font-size:20px;color:#1f2937;background:#fff}
+input:focus{outline:3px solid #f39a1425;border-color:var(--o)}
+input[readonly]{background:#f8fafc;color:#475467}
+.actions{display:flex;justify-content:flex-end;gap:12px;margin-top:10px}
+.btn{border:0;background:var(--n);color:#fff;border-radius:12px;padding:13px 19px;font:inherit;font-weight:900;cursor:pointer;font-size:17px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.message{min-height:26px;margin:2px 0 14px;font-weight:800;line-height:1.45}
+.message.ok{color:var(--ok)}.message.bad{color:var(--bad)}
+.note{margin-top:16px;color:var(--m);font-size:14px;line-height:1.55}
+@media(max-width:650px){.head{flex-direction:column}h1{font-size:34px}.card{padding:20px}.back{align-self:flex-start}}
+</style>
+</head>
+<body>
+<div class="top"></div>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <div class="eyebrow">FIRST-TIME PRACTICE REGISTRATION</div>
+      <h1>Practice Registration<span class="zh">首次練習登記</span></h1>
+      <div class="sub">Enter your Employee ID. Your name will appear automatically.<span class="zh">請輸入工號，系統會自動顯示英文姓名與中文姓名。</span></div>
+    </div>
+    <a class="back" href="filipino-leader-training-preview.html">← Training Center｜培訓中心</a>
+  </div>
+
+  <section class="card">
+    <label class="field">Employee ID<span class="zh">工號</span>
+      <input id="employeeId" inputmode="numeric" autocomplete="off" placeholder="Employee ID｜工號">
+    </label>
+
+    <label class="field">English Name<span class="zh">英文姓名</span>
+      <input id="englishName" readonly placeholder="Auto-fill｜自動帶入">
+    </label>
+
+    <label class="field">Chinese Name<span class="zh">中文姓名</span>
+      <input id="chineseName" readonly placeholder="Auto-fill｜自動帶入">
+    </label>
+
+    <div class="message" id="message" aria-live="polite"></div>
+    <div class="actions"><button class="btn" id="startButton" disabled>Start｜開始</button></div>
+  </section>
+
+  <div class="note">For personal practice records only. Please confirm that the displayed names are yours before starting.<span class="zh">僅供個人練習紀錄使用；開始前請確認顯示的姓名正確。</span></div>
+</main>
+
+<script src="filipino-practice-identity-preview.js"></script>
+<script>
+(() => {
+  const identity = PracticeIdentityFactory.createPracticeIdentity();
+  const employeeIdInput = document.getElementById('employeeId');
+  const englishName = document.getElementById('englishName');
+  const chineseName = document.getElementById('chineseName');
+  const message = document.getElementById('message');
+  const startButton = document.getElementById('startButton');
+  let lookupTimer = null;
+  let lookupSerial = 0;
+  let verifiedEmployeeId = '';
+
+  function clearNames(){
+    verifiedEmployeeId = '';
+    englishName.value = '';
+    chineseName.value = '';
+    startButton.disabled = true;
+  }
+
+  function setMessage(text, kind=''){
+    message.textContent = text;
+    message.className = 'message' + (kind ? ' ' + kind : '');
+  }
+
+  async function lookup(){
+    const employeeId = employeeIdInput.value.trim();
+    const serial = ++lookupSerial;
+    clearNames();
+    if (!employeeId) { setMessage(''); return; }
+    setMessage('Checking Employee ID…｜正在查詢工號…');
+    try {
+      const result = await identity.lookupEmployee(employeeId);
+      if (serial !== lookupSerial) return;
+      if (!result || !result.ok) {
+        setMessage('Employee ID not found. Please contact the training administrator.｜查無此工號，請洽培訓管理員。','bad');
+        return;
+      }
+      englishName.value = result.englishName || '';
+      chineseName.value = result.chineseName || '';
+      verifiedEmployeeId = employeeId;
+      startButton.disabled = false;
+      setMessage('Please confirm your name.｜請確認姓名是否正確。','ok');
+    } catch (_) {
+      if (serial !== lookupSerial) return;
+      setMessage('Unable to check the Employee ID. Please try again.｜目前無法查詢工號，請稍後再試。','bad');
+    }
+  }
+
+  employeeIdInput.addEventListener('input', () => {
+    clearTimeout(lookupTimer);
+    clearNames();
+    setMessage('');
+    lookupTimer = setTimeout(lookup, 450);
+  });
+  employeeIdInput.addEventListener('blur', () => { clearTimeout(lookupTimer); lookup(); });
+  employeeIdInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); clearTimeout(lookupTimer); lookup(); }
+  });
+
+  startButton.addEventListener('click', async () => {
+    const employeeId = employeeIdInput.value.trim();
+    if (!verifiedEmployeeId || employeeId !== verifiedEmployeeId) return;
+    startButton.disabled = true;
+    setMessage('Preparing your practice profile…｜正在準備練習資料…');
+    try {
+      const result = await identity.register(employeeId);
+      if (!result || !result.ok) {
+        setMessage('Registration unavailable. Please contact the training administrator.｜目前無法完成登記，請洽培訓管理員。','bad');
+        startButton.disabled = false;
+        return;
+      }
+      englishName.value = result.englishName || englishName.value;
+      chineseName.value = result.chineseName || chineseName.value;
+      window.location.href = 'filipino-leader-training-preview.html';
+    } catch (_) {
+      setMessage('Registration unavailable. Please try again.｜目前無法完成登記，請稍後再試。','bad');
+      startButton.disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>
