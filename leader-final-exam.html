@@ -27,7 +27,7 @@ h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
 .question{color:var(--n);font-size:34px;font-weight:900;line-height:1.55;margin:12px 0 24px}
 .options{display:grid;gap:14px}
 .option{width:100%;text-align:left;border:2px solid #cbd6e2;background:#fff;border-radius:15px;padding:19px 21px;cursor:pointer;font:inherit;font-size:27px;color:#1f2937;line-height:1.5}
-.option:hover{border-color:var(--n);background:#f8fafc}.option.selected{border-color:var(--o);background:#fff8ea}
+.option:hover{border-color:var(--n);background:#f8fafc}.option.selected{border-color:var(--o);background:#fff3d6;box-shadow:0 0 0 4px #f39a1422}.option.selected strong{color:var(--o)}
 .option strong{display:inline-block;width:38px;color:var(--n)}
 .actions{display:flex;justify-content:space-between;gap:14px;margin-top:24px;flex-wrap:wrap}
 .btn{border:0;background:var(--n);color:#fff;border-radius:13px;padding:14px 20px;font:inherit;font-size:21px;font-weight:900;cursor:pointer}
@@ -286,11 +286,18 @@ function updatePresence(state='active'){
   }
 
   prevButton.addEventListener('click',()=>{if(index>0){index--;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
-  nextButton.addEventListener('click',()=>{if(index<COUNT-1){index++;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
+  nextButton.addEventListener('click',()=>{if(answers[index]===null){alert('請先選擇本題答案。');return}if(index<COUNT-1){index++;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
 
   submitButton.addEventListener('click',async()=>{
-    const missing=answers.filter(v=>v===null).length;
-    if(missing && !confirm('尚有 '+missing+' 題未作答，仍要交卷嗎？')) return;
+    const missingIndexes=answers.map((v,i)=>v===null?i:-1).filter(i=>i>=0);
+    if(missingIndexes.length){
+      index=missingIndexes[0];
+      save();
+      render();
+      alert('尚有 '+missingIndexes.length+' 題未作答，請先完成所有題目。');
+      window.scrollTo({top:0,behavior:'smooth'});
+      return;
+    }
     submitButton.disabled=true;
     const correct=QUESTIONS.reduce((n,q,i)=>n+(answers[i]===q.a?1:0),0);
     const score=correct*2.5;
