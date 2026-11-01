@@ -48,3 +48,12 @@ test('總會考選項順序固定並與紙本一致，不再隨機洗牌', () =>
   assert.match(html, /答案選項順序固定/);
   assert.match(html, /orderMaps\s*=\s*QUESTIONS\.map\(q=>Array\.from\(\{length:q\.c\.length\},\(_,i\)=>i\)\)/);
 });
+
+
+test('總會考禁止空題前進與交卷', () => {
+  const html = fs.readFileSync(path.join(root, 'leader-final-exam.html'), 'utf8');
+  assert.match(html, /if\(answers\[index\]===null\)\{alert\('請先選擇本題答案。'\);return\}/);
+  assert.match(html, /const missingIndexes=answers\.map/);
+  assert.match(html, /尚有.*題未作答，請先完成所有題目/);
+  assert.doesNotMatch(html, /仍要交卷嗎/);
+});
