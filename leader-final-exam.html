@@ -90,6 +90,7 @@ h1{margin:8px 0 0;color:var(--n);font-size:43px;line-height:1.2}
       <div class="score" id="score"></div>
       <div id="summary"></div>
       <div id="review"></div>
+      <p class="note" id="resultCloud"></p>
       <div class="actions">
         <a class="btn alt" href="leader-training.html" style="text-decoration:none">返回培訓中心</a>
         <button class="btn" id="restartButton">重新測驗</button>
@@ -243,7 +244,7 @@ function updatePresence(state='active'){
   const progressText=document.getElementById('progressText'), progressBar=document.getElementById('progressBar'), answeredText=document.getElementById('answeredText');
   const prevButton=document.getElementById('prevButton'), nextButton=document.getElementById('nextButton'), submitButton=document.getElementById('submitButton');
   const questionView=document.getElementById('questionView'), resultView=document.getElementById('resultView');
-  const scoreEl=document.getElementById('score'), summary=document.getElementById('summary'), review=document.getElementById('review'), restartButton=document.getElementById('restartButton');
+  const scoreEl=document.getElementById('score'), summary=document.getElementById('summary'), review=document.getElementById('review'), resultCloud=document.getElementById('resultCloud'), restartButton=document.getElementById('restartButton');
 
   employeeIdInput.addEventListener('input',()=>{employeeId=employeeIdInput.value.trim();save()});
   employeeNameInput.addEventListener('input',()=>{employeeName=employeeNameInput.value.trim();save()});
@@ -282,11 +283,13 @@ function updatePresence(state='active'){
   prevButton.addEventListener('click',()=>{if(index>0){index--;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
   nextButton.addEventListener('click',()=>{if(index<COUNT-1){index++;save();render();window.scrollTo({top:0,behavior:'smooth'})}});
 
-  submitButton.addEventListener('click',()=>{
+  submitButton.addEventListener('click',async()=>{
     const missing=answers.filter(v=>v===null).length;
     if(missing && !confirm('尚有 '+missing+' 題未作答，仍要交卷嗎？')) return;
+    submitButton.disabled=true;
     const correct=QUESTIONS.reduce((n,q,i)=>n+(answers[i]===q.a?1:0),0);
     const score=correct*2.5;
+    const finishedAt=new Date().toISOString();
     scoreEl.textContent=score.toFixed(1).replace('.0','')+' / 100';
     summary.innerHTML='<p><strong>工號：</strong>'+escapeHtml(employeeId)+'　<strong>姓名：</strong>'+escapeHtml(employeeName)+'</p><p><strong>答對：</strong>'+correct+' / '+COUNT+'</p>';
     review.innerHTML='<h2>錯題檢視</h2>';
@@ -296,7 +299,42 @@ function updatePresence(state='active'){
         review.innerHTML+='<div class="review-item"><strong>Q'+(i+1)+'. '+escapeHtml(q.q)+'</strong><div class="bad">你的答案：'+escapeHtml(your)+'</div><div class="ok">正確答案：'+escapeHtml(q.c[q.a])+'</div></div>';
       }
     });
-    finishPresence();questionView.hidden=true;resultView.classList.add('show');sessionStorage.removeItem(storageKey);window.scrollTo({top:0,behavior:'smooth'});
+    finishPresence();
+    questionView.hidden=true;
+    resultView.classList.add('show');
+    resultCloud.textContent='總會考成績寫入中…';
+    window.scrollTo({top:0,behavior:'smooth'});
+    try{
+      const payload={
+        course:'總會考｜1～8堂綜合測驗',
+        courseId:'FINAL40',
+        code:employeeId+'｜'+employeeName,
+        name:employeeName,
+        email:'',
+        publicOpt:false,
+        date:presenceDate(),
+        score,
+        correct,
+        total:COUNT,
+        answers,
+        domains:{},
+        startedAt,
+        finishedAt
+      };
+      const resp=await fetch(presenceApi,{
+        method:'POST',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify(payload)
+      });
+      const d=await resp.json();
+      if(!d.ok) throw new Error(d.error||'寫入失敗');
+      resultCloud.textContent='總會考成績已記錄到管理中心。';
+      sessionStorage.removeItem(storageKey);
+    }catch(e){
+      resultCloud.textContent='成績顯示正常，但後台寫入失敗，請立即告知管理者保留本頁成績。';
+    }finally{
+      submitButton.disabled=false;
+    }
   });
 
   restartButton.addEventListener('click',()=>{
