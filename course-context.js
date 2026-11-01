@@ -21,15 +21,18 @@
     },
     {
       id: 'C04', number: '4、7', ordinal: '第4、7堂', toolLabel: '第4、7堂｜異常處理、紀律5S與安全管理',
-      name: '異常處理、紀律5S與安全管理', page: 'course47.html', slideUrl: null,
+      name: '異常處理、紀律5S與安全管理', page: 'course47.html',
+      slideUrl: 'https://docs.google.com/presentation/d/1IOr9HPgQO5PTEvSxnPO3AEUgJwkfPDCPYZTJ8-_1e4w/edit?usp=drivesdk',
     },
     {
       id: 'C05', number: '5、6', ordinal: '第5、6堂', toolLabel: '第5、6堂｜新人帶教、現場溝通與工作交接',
-      name: '新人帶教、現場溝通與工作交接', page: 'course56.html', slideUrl: null,
+      name: '新人帶教、現場溝通與工作交接', page: 'course56.html',
+      slideUrl: 'https://docs.google.com/presentation/d/1DskYRg6VnRIFGSqWdInKvW4feY2OUoV7RXdF_Xbe1BA/edit?usp=drivesdk',
     },
     {
       id: 'C08', number: '8', ordinal: '第八堂', toolLabel: '第8堂｜基礎改善與數據管理',
-      name: '基礎改善與數據管理', page: 'course08.html', slideUrl: null,
+      name: '基礎改善與數據管理', page: 'course08.html',
+      slideUrl: 'https://docs.google.com/presentation/d/1R6VLTOWzwDGWxQBqdDSInbp_FiTXZf6OIneAxNmK3RI/edit?usp=drivesdk',
     },
     {
       id: 'FINAL40', number: '總', ordinal: '總會考', toolLabel: '總會考｜1～8堂綜合測驗',
