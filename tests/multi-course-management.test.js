@@ -36,11 +36,14 @@ test('上課簡報入口依課程開啟正確的 Google Drive 檔案', () => {
 
   renderCourseSlideLinks(slides);
 
-  assert.equal((slides.innerHTML.match(/<a /g) || []).length, 3);
+  assert.equal((slides.innerHTML.match(/<a /g) || []).length, 6);
   assert.match(slides.innerHTML, /href="https:\/\/docs\.google\.com\/presentation\/d\/1BX5wWaszSJTwxCKt6Mh9P76pGP7dhrkH\/edit\?usp=drivesdk&amp;ouid=116493872695254554480&amp;rtpof=true&amp;sd=true"[^>]*target="_blank"[^>]*>[^<]*<span>第一堂<\/span>/);
   assert.match(slides.innerHTML, /href="https:\/\/docs\.google\.com\/presentation\/d\/1kTR-a77AyvccZb60p2xJnnMftGA8QxRM\/edit\?usp=drivesdk&amp;ouid=116493872695254554480&amp;rtpof=true&amp;sd=true"[^>]*target="_blank"[^>]*>[^<]*<span>第二堂<\/span>/);
   assert.match(slides.innerHTML, /href="https:\/\/docs\.google\.com\/presentation\/d\/1Kgd37u0VXOMXav8Il9N9nDNJdrf8Ojn_\/edit\?usp=drivesdk&amp;ouid=116493872695254554480&amp;rtpof=true&amp;sd=true"[^>]*target="_blank"[^>]*>[^<]*<span>第三堂<\/span>/);
-  assert.equal((slides.innerHTML.match(/rel="noopener noreferrer"/g) || []).length, 3);
+  assert.match(slides.innerHTML, /1IOr9HPgQO5PTEvSxnPO3AEUgJwkfPDCPYZTJ8-_1e4w[^>]*target="_blank"[^>]*>[^<]*<span>第4、7堂<\/span>/);
+  assert.match(slides.innerHTML, /1DskYRg6VnRIFGSqWdInKvW4feY2OUoV7RXdF_Xbe1BA[^>]*target="_blank"[^>]*>[^<]*<span>第5、6堂<\/span>/);
+  assert.match(slides.innerHTML, /1R6VLTOWzwDGWxQBqdDSInbp_FiTXZf6OIneAxNmK3RI[^>]*target="_blank"[^>]*>[^<]*<span>第八堂<\/span>/);
+  assert.equal((slides.innerHTML.match(/rel="noopener noreferrer"/g) || []).length, 6);
 });
 
 test('統計與成績頁依所選課程顯示名稱並返回正確測驗', () => {
