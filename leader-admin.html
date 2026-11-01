@@ -174,7 +174,7 @@ text-align:center}.metric .label{font-size:17px}.tool p{font-size:17px}.wrap{pad
 </div>
 </div>
 <section class="section">
-<h2>8堂課程管理總覽</h2>
+<h2>8堂課程＋總會考管理總覽</h2>
 <div class="table-wrap">
 <table>
 <thead>
@@ -197,17 +197,17 @@ text-align:center}.metric .label{font-size:17px}.tool p{font-size:17px}.wrap{pad
 <div class="tools">
 <div class="tool">
 <h3>📊 成績與能力分析</h3>
-<p>查看各堂課統計、能力面向與常錯題。</p>
+<p>查看各堂課與總會考統計、能力面向與常錯題。</p>
 <div id="statsCourseLinks" class="course-tool-links"></div>
 </div>
 <div class="tool">
 <h3>🏆 成績列表</h3>
-<p>依課程查看填寫代號、分數與排名。</p>
+<p>依課程與總會考查看工號／代號、姓名、分數與排名。</p>
 <div id="leaderboardCourseLinks" class="course-tool-links"></div>
 </div>
 <div class="tool">
 <h3>📥 全體成績匯出</h3>
-<p>匯出所有課程、所有作答人次，包含不公開成績與重考紀錄。</p>
+<p>匯出所有課程與總會考的全部作答人次，包含不公開成績與重考紀錄。</p>
 <button class="btn" onclick="exportAllResults()">匯出全體成績 CSV</button>
 </div>
 <div class="tool">
@@ -217,74 +217,152 @@ text-align:center}.metric .label{font-size:17px}.tool p{font-size:17px}.wrap{pad
 </div>
 </div>
 </section>
-<div class="foot">系統版本 V1.6｜更新日期 2026-10-08</div>
+<div class="foot">系統版本 V2.0｜更新日期 2026-11-01</div>
 </section>
 </main>
 <script src="course-context.js"></script>
-<script>const API='https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec';
-const LIVE_COURSE_IDS=new Set(['C01','C02','C03','C05','C06']);
+<script>
+const API='https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec';
 CourseContext.renderCourseSlideLinks(document.getElementById('slideCourseLinks'));
 CourseContext.renderCourseToolLinks(document.getElementById('statsCourseLinks'),'stats');
 CourseContext.renderCourseToolLinks(document.getElementById('leaderboardCourseLinks'),'leaderboard');
+
 let token=sessionStorage.getItem('chendaAdminToken')||'';
-if(token){showDashboard();
-loadSummary();
-}async function post(data){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});
-return r.json();
-}async function loginAdmin(){loginMsg.textContent='';
-const p=pin.value.trim();
-if(!p){loginMsg.textContent='請輸入管理 PIN。';
-return;
-}try{const d=await post({action:'adminLogin',pin:p});
-if(!d.ok){loginMsg.textContent=d.error||'登入失敗。';
-return;
-}token=d.token;
-sessionStorage.setItem('chendaAdminToken',token);
-showDashboard();
-loadSummary();
-}catch(e){loginMsg.textContent='目前無法連線管理後端。';
-}}function showDashboard(){login.classList.add('hide');
-dashboard.classList.remove('hide');
-}function logout(){sessionStorage.removeItem('chendaAdminToken');
-location.reload();
-}async function loadSummary(){try{const d=await post({action:'adminSummary',token});
-if(!d.ok){sessionStorage.removeItem('chendaAdminToken');
-alert(d.error||'登入已失效');
-location.reload();
-return;
-}mOpen.textContent=LIVE_COURSE_IDS.size+'/'+d.overview.totalCourses;
-mAttempts.textContent=d.overview.totalAttempts;
-mAvg.textContent=d.overview.avgScore==null?'—':d.overview.avgScore+' 分';
-mPass.textContent=d.overview.pass80==null?'—':d.overview.pass80+'%';
-courseRows.innerHTML='';
-d.courses.forEach(c=>{const tr=document.createElement('tr');
-const active=LIVE_COURSE_IDS.has(c.id);
-if(c.id==='C05'||c.id==='C06'){const shared=d.courses.find(row=>row.id==='C05');c={...c,count:shared?.count||0,avgScore:shared?.avgScore??null,pass80:shared?.pass80??null};}
-tr.innerHTML=`<td>${c.id.replace('C','')}｜${c.name}</td>
-<td>
-<span class="status ${active?'open':'coming'}">${active?((c.id==='C05'||c.id==='C06')?'開放（5、6堂合併）':'開放'):'準備中'}</span>
-</td>
-<td>${c.count||0}</td>
-<td>${c.avgScore==null?'—':c.avgScore}</td>
-<td>${c.pass80==null?'—':c.pass80+'%'}</td>
-<td>${active?`<a class="btn" href="stats.html?courseId=${c.id==='C06'?'C05':c.id}">查看</a>`:'—'}</td>`;
-courseRows.appendChild(tr);
-});
-}catch(e){alert('無法取得管理統計資料。');
-}}
-function csvCell(v){const s=String(v??'');return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
-function downloadCsv(name,rows){const csv='\uFEFF'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n'),b=new Blob([csv],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
-async function exportAllResults(){try{const d=await post({action:'adminResults',token});if(!d.ok){alert(d.error||'匯出失敗。');return;}const domains=[...new Set(d.rows.flatMap(r=>Object.keys(r.domains||{})))];const header=['課程編號','課程名稱','考試日期','送出時間','代號／工號','Email','第幾次考試','總成績','答對數','答錯數','未作答數','總題數','80分以上','公開成績',...domains];const body=d.rows.map(r=>[r.courseId,r.course,r.examDate,r.submittedAt,r.code,r.email,r.attemptNo,r.score,r.correct,r.wrong,r.unanswered,r.total,r.pass80,r.publicOpt,...domains.map(k=>(r.domains||{})[k]??'')]);downloadCsv('晨達現場幹部培訓_全體成績_'+new Date().toISOString().slice(0,10)+'.csv',[header,...body]);}catch(e){alert('目前無法取得全體成績。');}}
-async function clearAll(){const c=prompt('此操作會清除所有歷史成績。\n若確定要繼續，請輸入 DELETE');
-if(c!=='DELETE')return;
-const again=confirm('最後確認：確定要清除所有歷史成績嗎？此動作無法復原。');
-if(!again)return;
-try{const d=await post({action:'clearAll',token,confirm:'DELETE'});
-if(d.ok){alert('已清除 '+d.deleted+' 筆歷史成績。');
-loadSummary();
-}else alert(d.error||'清除失敗。');
-}catch(e){alert('目前無法連線後端。');
-}}</script>
+if(token){showDashboard();loadSummary();}
+
+async function post(data){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});
+  return r.json();
+}
+
+async function loginAdmin(){
+  loginMsg.textContent='';
+  const p=pin.value.trim();
+  if(!p){loginMsg.textContent='請輸入管理 PIN。';return;}
+  try{
+    const d=await post({action:'adminLogin',pin:p});
+    if(!d.ok){loginMsg.textContent=d.error||'登入失敗。';return;}
+    token=d.token;
+    sessionStorage.setItem('chendaAdminToken',token);
+    showDashboard();
+    loadSummary();
+  }catch(e){loginMsg.textContent='目前無法連線管理後端。';}
+}
+
+function showDashboard(){login.classList.add('hide');dashboard.classList.remove('hide');}
+function logout(){sessionStorage.removeItem('chendaAdminToken');location.reload();}
+
+function rowIdentity(r){
+  let code=String(r.code||'');
+  let name=String(r.name||'');
+  if(!name && String(r.courseId||'')==='FINAL40' && code.includes('｜')){
+    const i=code.indexOf('｜');
+    name=code.slice(i+1).trim();
+    code=code.slice(0,i).trim();
+  }
+  return {code,name};
+}
+
+function scoreMetrics(rows){
+  const valid=(rows||[]).filter(r=>Number.isFinite(Number(r.score)));
+  if(!valid.length)return {count:0,avgScore:null,pass80:null};
+  const scores=valid.map(r=>Number(r.score));
+  const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*10)/10;
+  const pass=Math.round(scores.filter(x=>x>=80).length/scores.length*100);
+  return {count:valid.length,avgScore:avg,pass80:pass};
+}
+
+function addOverviewRow(label,statusLabel,metrics,courseId){
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${label}</td>
+<td><span class="status open">${statusLabel}</span></td>
+<td>${metrics.count||0}</td>
+<td>${metrics.avgScore==null?'—':metrics.avgScore}</td>
+<td>${metrics.pass80==null?'—':metrics.pass80+'%'}</td>
+<td><a class="btn" href="stats.html?courseId=${courseId}">查看</a></td>`;
+  courseRows.appendChild(tr);
+}
+
+async function loadSummary(){
+  try{
+    const [d,all]=await Promise.all([
+      post({action:'adminSummary',token}),
+      post({action:'adminResults',token})
+    ]);
+    if(!d.ok||!all.ok){
+      sessionStorage.removeItem('chendaAdminToken');
+      alert((d.error||all.error)||'登入已失效');
+      location.reload();
+      return;
+    }
+
+    const allRows=Array.isArray(all.rows)?all.rows:[];
+    const overall=scoreMetrics(allRows);
+    mOpen.textContent='8/8';
+    mAttempts.textContent=overall.count;
+    mAvg.textContent=overall.avgScore==null?'—':overall.avgScore+' 分';
+    mPass.textContent=overall.pass80==null?'—':overall.pass80+'%';
+
+    const backendCourses=new Map((d.courses||[]).map(x=>[x.id,x]));
+    courseRows.innerHTML='';
+
+    CourseContext.TEACHING_COURSES.forEach(course=>{
+      const source=backendCourses.get(course.resultId)||{};
+      const metrics={
+        count:Number(source.count)||0,
+        avgScore:source.avgScore??null,
+        pass80:source.pass80??null
+      };
+      const suffix=course.combined?` <small style="color:#6b7280">（${course.combined}）</small>`:'';
+      addOverviewRow(`${course.number}｜${course.name}${suffix}`,'已完成',metrics,course.resultId);
+    });
+
+    const finalRows=allRows.filter(r=>String(r.courseId||'')==='FINAL40');
+    addOverviewRow('總會考｜1～8堂綜合測驗','已完成',scoreMetrics(finalRows),'FINAL40');
+  }catch(e){
+    alert('無法取得管理統計資料。');
+  }
+}
+
+function csvCell(v){
+  const s=String(v??'');
+  return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;
+}
+function downloadCsv(name,rows){
+  const csv='\uFEFF'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+  const b=new Blob([csv],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');
+  a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);
+}
+
+async function exportAllResults(){
+  try{
+    const d=await post({action:'adminResults',token});
+    if(!d.ok){alert(d.error||'匯出失敗。');return;}
+    const rows=Array.isArray(d.rows)?d.rows:[];
+    const domains=[...new Set(rows.flatMap(r=>Object.keys(r.domains||{})))];
+    const header=['課程編號','課程名稱','考試日期','送出時間','工號／代號','姓名','Email','第幾次考試','總成績','答對數','答錯數','未作答數','總題數','80分以上','公開成績',...domains];
+    const body=rows.map(r=>{
+      const identity=rowIdentity(r);
+      return [r.courseId,r.course,r.examDate,r.submittedAt,identity.code,identity.name,r.email,r.attemptNo,r.score,r.correct,r.wrong,r.unanswered,r.total,r.pass80,r.publicOpt,...domains.map(k=>(r.domains||{})[k]??'')];
+    });
+    downloadCsv('晨達現場幹部培訓_全體成績含總會考_'+new Date().toISOString().slice(0,10)+'.csv',[header,...body]);
+  }catch(e){
+    alert('目前無法取得全體成績。');
+  }
+}
+
+async function clearAll(){
+  const c=prompt('此操作會清除所有歷史成績。\n若確定要繼續，請輸入 DELETE');
+  if(c!=='DELETE')return;
+  const again=confirm('最後確認：確定要清除所有歷史成績嗎？此動作無法復原。');
+  if(!again)return;
+  try{
+    const d=await post({action:'clearAll',token,confirm:'DELETE'});
+    if(d.ok){alert('已清除 '+d.deleted+' 筆歷史成績。');loadSummary();}
+    else alert(d.error||'清除失敗。');
+  }catch(e){alert('目前無法連線後端。');}
+}
+</script>
 </body>
 </html>
 
