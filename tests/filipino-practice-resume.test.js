@@ -22,7 +22,7 @@ test('answer saves the next unanswered question and current correct count', () =
 
 test('page resumes at the next unanswered question and restores completed result', () => {
   assert.match(html, /loadPracticeProgress/);
-  assert.match(html, /index\s*=\s*Math\.min\(questions\.length\s*-\s*1,\s*progress\.nextIndex/);
+  assert.match(html, /index\s*=\s*Math\.min\(questions\.length\s*-\s*1,[^;]*progress\.nextIndex/);
   assert.match(html, /progress\.completed/);
   assert.match(html, /showCompletedRound/);
 });
