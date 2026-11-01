@@ -54,11 +54,11 @@ function dashboardContext(summary) {
   return { context, rows };
 }
 
-test('管理頁將已有正式入口的前3堂顯示為開放並提供查看功能', async () => {
+test('管理頁將8堂課全部標示完成並加入總會考', async () => {
   const summary = {
     ok: true,
     overview: {
-      openCourses: 1,
+      openCourses: 8,
       totalCourses: 8,
       totalAttempts: 11,
       avgScore: 90,
@@ -66,20 +66,28 @@ test('管理頁將已有正式入口的前3堂顯示為開放並提供查看功�
     },
     courses: [
       { id: 'C01', name: '現場幹部的角色與責任', status: 'open', count: 6, avgScore: 95, pass80: 100 },
-      { id: 'C02', name: '工作安排與進度掌握', status: 'coming', count: 5, avgScore: 84, pass80: 80 },
-      { id: 'C03', name: '品質意識與自主檢查', status: 'coming', count: 0, avgScore: null, pass80: null },
-      { id: 'C04', name: '異常處理與問題判斷', status: 'coming', count: 0, avgScore: null, pass80: null },
+      { id: 'C02', name: '工作安排與進度掌握', status: 'open', count: 5, avgScore: 84, pass80: 80 },
+      { id: 'C03', name: '品質意識與自主檢查', status: 'open', count: 4, avgScore: 88, pass80: 75 },
+      { id: 'C04', name: '異常處理與問題判斷', status: 'open', count: 3, avgScore: 86, pass80: 67 },
+      { id: 'C05', name: '新人帶教與工作教導', status: 'open', count: 3, avgScore: 90, pass80: 100 },
+      { id: 'C08', name: '基礎改善與數據管理', status: 'open', count: 2, avgScore: 92, pass80: 100 },
     ],
   };
   const { context, rows } = dashboardContext(summary);
 
   await context.loadSummary();
 
-  assert.equal(context.mOpen.textContent, '5/8');
-  assert.match(rows[1].innerHTML, /status open[^>]*>開放/);
-  assert.match(rows[1].innerHTML, /stats\.html\?courseId=C02/);
-  assert.match(rows[2].innerHTML, /status open[^>]*>開放/);
-  assert.match(rows[2].innerHTML, /stats\.html\?courseId=C03/);
-  assert.match(rows[3].innerHTML, /status coming[^>]*>準備中/);
+  assert.equal(context.mOpen.textContent, '8/8');
+  assert.equal(rows.length, 9);
+  assert.match(rows[0].innerHTML, /1｜現場幹部的角色與責任/);
+  assert.match(rows[3].innerHTML, /4｜異常處理與問題判斷/);
+  assert.match(rows[3].innerHTML, /已完成/);
+  assert.match(rows[3].innerHTML, /stats\.html\?courseId=C04/);
+  assert.match(rows[4].innerHTML, /5｜新人帶教與工作教導/);
+  assert.match(rows[5].innerHTML, /6｜溝通、回報與工作交接/);
+  assert.match(rows[6].innerHTML, /7｜現場紀律、5S與安全管理/);
+  assert.match(rows[7].innerHTML, /8｜基礎改善與數據管理/);
+  assert.match(rows[7].innerHTML, /stats\.html\?courseId=C08/);
+  assert.match(rows[8].innerHTML, /總會考｜1～8堂綜合測驗/);
+  assert.match(rows[8].innerHTML, /stats\.html\?courseId=FINAL40/);
 });
-
