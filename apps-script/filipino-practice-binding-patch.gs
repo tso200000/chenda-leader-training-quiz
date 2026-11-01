@@ -1,6 +1,7 @@
 const FILIPINO_PRACTICE_SPREADSHEET_ID_ = '1LcfHM6I1cltMhKAcXFG0Kb9nHCnYw-aw3ZCSxvmhsQs';
 const FILIPINO_EMPLOYEE_SHEET_ = 'EmployeeMaster';
 const FILIPINO_BINDING_SHEET_ = 'PracticeDeviceBindings';
+const FILIPINO_EVENTS_SHEET_ = 'PracticeEvents';
 const FILIPINO_ACTIVE_ = 'ACTIVE';
 const FILIPINO_REGISTRATION_MESSAGE_ = 'Registration unavailable. Please contact the training administrator.';
 
@@ -9,7 +10,61 @@ function handleFilipinoPracticeAction_(payload) {
   if (action === 'employeeLookup') return filipinoEmployeeLookup_(payload);
   if (action === 'practiceRegister') return filipinoPracticeRegister_(payload);
   if (action === 'practiceIdentity') return filipinoPracticeIdentity_(payload);
+  if (action === 'practiceEvent') return filipinoPracticeEvent_(payload);
   return null;
+}
+
+function filipinoPracticeEvent_(payload) {
+  const eventId = String((payload && payload.eventId) || '').trim();
+  const employeeId = filipinoNormalizeEmployeeId_(payload && payload.employeeId);
+  const courseId = String((payload && payload.courseId) || '').trim();
+  const eventType = String((payload && payload.eventType) || '').trim().toUpperCase();
+  const questionNo = payload && payload.questionNo !== undefined && payload.questionNo !== null ? payload.questionNo : '';
+  const isCorrect = payload && typeof payload.isCorrect === 'boolean' ? payload.isCorrect : '';
+  const occurredAt = String((payload && payload.occurredAt) || '').trim() || new Date().toISOString();
+  const practiceRoundId = String((payload && payload.practiceRoundId) || '').trim();
+
+  if (!eventId || !employeeId || !courseId || !practiceRoundId) {
+    return filipinoPracticeError_('INVALID_PRACTICE_EVENT');
+  }
+  if (eventType !== 'ANSWER' && eventType !== 'ROUND_COMPLETE') {
+    return filipinoPracticeError_('INVALID_PRACTICE_EVENT');
+  }
+  if (!filipinoFindActiveEmployee_(employeeId)) {
+    return filipinoPracticeError_('EMPLOYEE_NOT_FOUND');
+  }
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const ss = SpreadsheetApp.openById(FILIPINO_PRACTICE_SPREADSHEET_ID_);
+    const sheet = ss.getSheetByName(FILIPINO_EVENTS_SHEET_);
+    if (!sheet) throw new Error('Missing sheet: ' + FILIPINO_EVENTS_SHEET_);
+
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      const existingEventIds = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+      for (let i = 0; i < existingEventIds.length; i++) {
+        if (String(existingEventIds[i][0] || '').trim() === eventId) {
+          return {ok: true, duplicate: true, eventId: eventId};
+        }
+      }
+    }
+
+    sheet.appendRow([
+      eventId,
+      employeeId,
+      courseId,
+      eventType,
+      eventType === 'ANSWER' ? questionNo : '',
+      eventType === 'ANSWER' ? isCorrect : '',
+      occurredAt,
+      practiceRoundId
+    ]);
+    return {ok: true, duplicate: false, eventId: eventId};
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function filipinoEmployeeLookup_(payload) {
