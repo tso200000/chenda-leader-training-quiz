@@ -114,7 +114,7 @@ font-weight:900}.slide-link small{color:var(--muted);
 font-size:15px;
 line-height:1.45}.slide-note{color:var(--muted);
 font-size:14px;
-margin-top:12px}.foot{margin-top:24px;
+margin-top:12px}.practice-intro{color:var(--muted);font-size:17px;line-height:1.55;margin:-5px 0 12px}.practice-status{font-size:16px;color:var(--muted);margin:0 0 12px}.practice-table{min-width:1220px}.practice-table td small{display:block;color:var(--muted);font-size:13px;line-height:1.45;margin-top:3px}.status.bound{background:#e6f4ea;color:#237a4b}.status.unbound{background:#eef2f6;color:#59697d}.btn.release-device{padding:9px 12px;font-size:15px;background:#fff;color:var(--r);border:1px solid #f1b7b7;white-space:nowrap}.foot{margin-top:24px;
 color:#40556f;
 font-size:17px;
 text-align:right}@media(min-width:1700px){.slide-dock{position:fixed;
@@ -192,6 +192,30 @@ text-align:center}.metric .label{font-size:17px}.tool p{font-size:17px}.wrap{pad
 </table>
 </div>
 </section>
+<section class="section" id="filipinoPracticeManagement">
+<h2>菲律賓幹部｜習題練習管理</h2>
+<p class="practice-intro">查看實際練習投入；以練習天數、作答題數與完成輪次為主，不以開啟網頁次數計算。</p>
+<div id="practiceStatus" class="practice-status">尚未載入練習資料。</div>
+<div class="table-wrap">
+<table class="practice-table">
+<thead>
+<tr>
+<th>工號</th>
+<th>英文名</th>
+<th>中文名</th>
+<th>綁定狀態</th>
+<th>練習天數</th>
+<th>作答題數</th>
+<th>完成輪次</th>
+<th>答對率</th>
+<th>最近練習</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody id="practiceRows"></tbody>
+</table>
+</div>
+</section>
 <section class="section">
 <h2>管理工具</h2>
 <div class="tools">
@@ -228,7 +252,7 @@ CourseContext.renderCourseToolLinks(document.getElementById('statsCourseLinks'),
 CourseContext.renderCourseToolLinks(document.getElementById('leaderboardCourseLinks'),'leaderboard');
 
 let token=sessionStorage.getItem('chendaAdminToken')||'';
-if(token){showDashboard();loadSummary();}
+if(token){showDashboard();loadSummary();loadPracticeOverview();}
 
 async function post(data){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});
@@ -246,6 +270,7 @@ async function loginAdmin(){
     sessionStorage.setItem('chendaAdminToken',token);
     showDashboard();
     loadSummary();
+    loadPracticeOverview();
   }catch(e){loginMsg.textContent='目前無法連線管理後端。';}
 }
 
@@ -348,6 +373,86 @@ async function exportAllResults(){
     downloadCsv('晨達現場幹部培訓_全體成績含總會考_'+new Date().toISOString().slice(0,10)+'.csv',[header,...body]);
   }catch(e){
     alert('目前無法取得全體成績。');
+  }
+}
+
+
+function escapeHtml(v){
+  return String(v??'').replace(/[&<>"']/g,ch=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[ch]);
+}
+
+function practiceTime(v){
+  if(!v)return '—';
+  const d=new Date(v);
+  if(Number.isNaN(d.getTime()))return escapeHtml(v);
+  return new Intl.DateTimeFormat('zh-TW',{
+    timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',
+    hour:'2-digit',minute:'2-digit',hour12:false
+  }).format(d);
+}
+
+async function loadPracticeOverview(){
+  practiceStatus.textContent='正在載入練習資料…';
+  try{
+    const d=await post({action:'adminPracticeOverview',token});
+    if(!d.ok){
+      practiceRows.innerHTML='';
+      practiceStatus.textContent=d.error==='UNAUTHORIZED'?'管理登入已失效。':'練習管理後端尚未接通。';
+      return;
+    }
+    const rows=Array.isArray(d.rows)?d.rows:[];
+    practiceRows.innerHTML='';
+    if(!rows.length){
+      practiceStatus.textContent='目前尚無員工主檔或練習紀錄。';
+      return;
+    }
+    practiceStatus.textContent='共 '+rows.length+' 位人員｜練習投入不計網頁開啟次數';
+    rows.forEach(r=>{
+      const tr=document.createElement('tr');
+      const active=String(r.bindingStatus||'')==='ACTIVE';
+      const statusText=active?'已綁定':'未綁定';
+      const statusClass=active?'bound':'unbound';
+      const boundInfo=active
+        ? '<small>綁定：'+practiceTime(r.boundAt)+'</small><small>最後辨識：'+practiceTime(r.lastSeenAt)+'</small>'
+        : (r.boundAt?'<small>前次綁定：'+practiceTime(r.boundAt)+'</small>':'');
+      const employeeId=escapeHtml(r.employeeId);
+      const displayName=escapeHtml(r.chineseName||r.englishName||r.employeeId);
+      tr.innerHTML=
+        '<td>'+employeeId+'</td>'+
+        '<td>'+escapeHtml(r.englishName)+'</td>'+
+        '<td>'+escapeHtml(r.chineseName)+'</td>'+
+        '<td><span class="status '+statusClass+'">'+statusText+'</span>'+boundInfo+'</td>'+
+        '<td>'+Number(r.activeDays||0)+'</td>'+
+        '<td>'+Number(r.answeredQuestions||0)+'</td>'+
+        '<td>'+Number(r.completedRounds||0)+'</td>'+
+        '<td>'+(r.correctRate==null?'—':escapeHtml(r.correctRate)+'%')+'</td>'+
+        '<td>'+practiceTime(r.lastPractice)+'</td>'+
+        '<td>'+(active
+          ? '<button class="btn release-device" data-employee-id="'+employeeId+'" data-display-name="'+displayName+'">解除裝置</button>'
+          : '—')+'</td>';
+      practiceRows.appendChild(tr);
+    });
+    practiceRows.querySelectorAll('.release-device').forEach(btn=>{
+      btn.addEventListener('click',()=>releasePracticeDevice(btn.dataset.employeeId,btn.dataset.displayName));
+    });
+  }catch(e){
+    practiceRows.innerHTML='';
+    practiceStatus.textContent='目前無法取得練習資料。';
+  }
+}
+
+async function releasePracticeDevice(employeeId,displayName){
+  const ok=confirm('確定要解除 '+displayName+'（'+employeeId+'）的裝置嗎？\n\n過去練習紀錄會保留；解除後才能在新裝置重新登記。');
+  if(!ok)return;
+  try{
+    const d=await post({action:'adminReleasePracticeDevice',token,employeeId});
+    if(!d.ok){alert(d.error||'解除失敗。');return;}
+    alert(d.released?'已解除裝置，歷史練習紀錄保留。':'目前沒有作用中的裝置綁定。');
+    loadPracticeOverview();
+  }catch(e){
+    alert('目前無法連線練習管理後端。');
   }
 }
 
