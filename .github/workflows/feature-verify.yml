@@ -17,4 +17,6 @@ jobs:
       - name: Node tests
         run: node --test tests/*.test.js
       - name: Apps Script patch syntax
-        run: node --check apps-script/filipino-practice-binding-patch.gs
+        run: |
+          cp apps-script/filipino-practice-binding-patch.gs /tmp/filipino-practice-binding-patch.js
+          node --check /tmp/filipino-practice-binding-patch.js
