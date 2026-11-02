@@ -33,3 +33,22 @@ test('backend de-duplicates by EventId before append', () => {
   assert.match(fn, /duplicate:\s*true/);
   assert.ok(fn.indexOf('duplicate: true') < fn.indexOf('appendRow'), 'duplicate check must happen before append');
 });
+
+
+test('practice events carry device token and backend requires matching ACTIVE binding', () => {
+  assert.match(page, /deviceToken:\s*practiceIdentity\.getDeviceToken\(\)/);
+  const fn = backend.slice(backend.indexOf('function filipinoPracticeEvent_'), backend.indexOf('function filipinoEmployeeLookup_'));
+  assert.match(fn, /deviceToken/);
+  assert.match(fn, /FILIPINO_BINDING_SHEET_/);
+  assert.match(fn, /rowDeviceToken\s*!==\s*deviceToken/);
+  assert.match(fn, /rowStatus\s*!==\s*FILIPINO_ACTIVE_/);
+  assert.match(fn, /INVALID_PRACTICE_DEVICE/);
+});
+
+test('practice event transport uses a local outbox and retries pending events', () => {
+  assert.match(page, /pendingEventsKey/);
+  assert.match(page, /enqueuePracticeEvent/);
+  assert.match(page, /flushPendingEvents/);
+  assert.match(page, /window\.addEventListener\('online'/);
+  assert.match(page, /text\/plain;charset=utf-8/);
+});
