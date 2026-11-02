@@ -141,7 +141,9 @@ h1{margin:7px 0 0;color:var(--n);font-size:48px;line-height:1.2}
   const COURSE_ID = 'FILIPINO_C01';
   const PRACTICE_API = 'https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec';
   const progressKey = 'filipino_practice_progress_' + COURSE_ID + '_' + learnerIdentity.employeeId;
+  const pendingEventsKey = 'filipino_practice_pending_events_' + COURSE_ID + '_' + learnerIdentity.employeeId;
   let index = 0, correct = 0, locked = false, practiceRoundId = '';
+  let flushingPendingEvents = false;
 
   function createRoundId() {
     if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
@@ -194,19 +196,68 @@ h1{margin:7px 0 0;color:var(--n);font-size:48px;line-height:1.2}
     return progress;
   }
 
+  function readPendingEvents() {
+    try {
+      const rows = JSON.parse(localStorage.getItem(pendingEventsKey) || '[]');
+      return Array.isArray(rows) ? rows : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function writePendingEvents(rows) {
+    localStorage.setItem(pendingEventsKey, JSON.stringify(rows || []));
+  }
+
+  function enqueuePracticeEvent(event) {
+    const rows = readPendingEvents();
+    if (!rows.some(x => x && x.eventId === event.eventId)) rows.push(event);
+    writePendingEvents(rows);
+    flushPendingEvents();
+  }
+
+  async function flushPendingEvents() {
+    if (flushingPendingEvents) return;
+    flushingPendingEvents = true;
+    try {
+      while (true) {
+        const rows = readPendingEvents();
+        if (!rows.length) break;
+        const event = rows[0];
+        try {
+          const payload = Object.assign({action:'practiceEvent'}, event);
+          const response = await fetch(PRACTICE_API, {
+            method:'POST',
+            headers:{'Content-Type':'text/plain;charset=utf-8'},
+            body:JSON.stringify(payload)
+          });
+          const result = await response.json();
+          if (!result || !result.ok) {
+            if (result && result.code === 'INVALID_PRACTICE_DEVICE') {
+              writePendingEvents([]);
+              window.location.replace('filipino-practice-register.html?return=filipino-practice01.html');
+            }
+            break;
+          }
+          writePendingEvents(readPendingEvents().filter(x => x && x.eventId !== event.eventId));
+        } catch (_) {
+          break;
+        }
+      }
+    } finally {
+      flushingPendingEvents = false;
+    }
+  }
+
   function sendPracticeEvent(event) {
-    const payload = Object.assign({action:'practiceEvent'}, event);
-    fetch(PRACTICE_API, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    }).catch(() => {});
+    enqueuePracticeEvent(event);
   }
 
   function recordAnswerEvent(q, right) {
     sendPracticeEvent({
       eventId: practiceRoundId + ':ANSWER:' + q[0],
       employeeId: learnerIdentity.employeeId,
+      deviceToken: practiceIdentity.getDeviceToken(),
       courseId: COURSE_ID,
       eventType: 'ANSWER',
       questionNo: q[0],
@@ -220,6 +271,7 @@ h1{margin:7px 0 0;color:var(--n);font-size:48px;line-height:1.2}
     sendPracticeEvent({
       eventId: practiceRoundId + ':ROUND_COMPLETE',
       employeeId: learnerIdentity.employeeId,
+      deviceToken: practiceIdentity.getDeviceToken(),
       courseId: COURSE_ID,
       eventType: 'ROUND_COMPLETE',
       questionNo: null,
@@ -308,6 +360,9 @@ h1{margin:7px 0 0;color:var(--n);font-size:48px;line-height:1.2}
     finishView.hidden = true; questionView.hidden = false;
     render(); window.scrollTo({top:0,behavior:'smooth'});
   });
+
+  window.addEventListener('online', () => flushPendingEvents());
+  flushPendingEvents();
 
   const progress = loadPracticeProgress();
   practiceRoundId = progress.practiceRoundId;
