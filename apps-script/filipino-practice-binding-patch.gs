@@ -14,6 +14,163 @@ function handleFilipinoPracticeAction_(payload) {
   return null;
 }
 
+
+function handleFilipinoPracticeAdminAction_(payload, adminAuthorized) {
+  const action = String((payload && payload.action) || '').trim();
+  if (action !== 'adminPracticeOverview' && action !== 'adminReleasePracticeDevice') return null;
+  if (adminAuthorized !== true) return {ok:false, error:'UNAUTHORIZED'};
+  if (action === 'adminPracticeOverview') return filipinoAdminPracticeOverview_(payload);
+  if (action === 'adminReleasePracticeDevice') return filipinoAdminReleasePracticeDevice_(payload);
+  return null;
+}
+
+function filipinoAdminPracticeOverview_() {
+  const ss = SpreadsheetApp.openById(FILIPINO_PRACTICE_SPREADSHEET_ID_);
+  const employeeSheet = ss.getSheetByName(FILIPINO_EMPLOYEE_SHEET_);
+  const bindingSheet = ss.getSheetByName(FILIPINO_BINDING_SHEET_);
+  const eventSheet = ss.getSheetByName(FILIPINO_EVENTS_SHEET_);
+  if (!employeeSheet || !bindingSheet || !eventSheet) throw new Error('Missing Filipino practice management sheet');
+
+  const employeeRows = employeeSheet.getLastRow() > 1
+    ? employeeSheet.getRange(2,1,employeeSheet.getLastRow()-1,4).getValues() : [];
+  const bindingRows = bindingSheet.getLastRow() > 1
+    ? bindingSheet.getRange(2,1,bindingSheet.getLastRow()-1,7).getValues() : [];
+  const eventRows = eventSheet.getLastRow() > 1
+    ? eventSheet.getRange(2,1,eventSheet.getLastRow()-1,8).getValues() : [];
+
+  return {ok:true, rows:filipinoBuildPracticeOverview_(employeeRows, bindingRows, eventRows)};
+}
+
+function filipinoAdminReleasePracticeDevice_(payload) {
+  const employeeId = filipinoNormalizeEmployeeId_(payload && payload.employeeId);
+  if (!employeeId) return {ok:false, error:'INVALID_EMPLOYEE_ID'};
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const ss = SpreadsheetApp.openById(FILIPINO_PRACTICE_SPREADSHEET_ID_);
+    const sheet = ss.getSheetByName(FILIPINO_BINDING_SHEET_);
+    if (!sheet) throw new Error('Missing sheet: ' + FILIPINO_BINDING_SHEET_);
+    const lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return {ok:true, released:0};
+
+    const rows = sheet.getRange(2,1,lastRow-1,7).getValues();
+    const now = new Date();
+    let released = 0;
+    for (let i=0;i<rows.length;i++) {
+      const rowEmployeeId = filipinoNormalizeEmployeeId_(rows[i][0]);
+      const rowStatus = String(rows[i][4] || '').trim().toUpperCase();
+      if (rowEmployeeId !== employeeId || rowStatus !== FILIPINO_ACTIVE_) continue;
+      rows[i][4] = 'RELEASED';
+      rows[i][5] = now;
+      rows[i][6] = 'ADMIN';
+      sheet.getRange(i+2,1,1,7).setValues([rows[i]]);
+      released++;
+    }
+    return {ok:true, released:released};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function filipinoBuildPracticeOverview_(employeeRows, bindingRows, eventRows) {
+  const map = {};
+
+  function ensure(employeeId) {
+    const id = filipinoNormalizeEmployeeId_(employeeId);
+    if (!id) return null;
+    if (!map[id]) {
+      map[id] = {
+        employeeId:id,
+        englishName:'',
+        chineseName:'',
+        bindingStatus:'UNBOUND',
+        boundAt:'',
+        lastSeenAt:'',
+        activeDays:0,
+        answeredQuestions:0,
+        completedRounds:0,
+        correctRate:null,
+        lastPractice:'',
+        _correctAnswers:0,
+        _activeDayMap:{},
+        _bindingSort:''
+      };
+    }
+    return map[id];
+  }
+
+  (employeeRows || []).forEach(row => {
+    const x = ensure(row[0]);
+    if (!x) return;
+    x.englishName = String(row[1] || '').trim();
+    x.chineseName = String(row[2] || '').trim();
+  });
+
+  (bindingRows || []).forEach(row => {
+    const x = ensure(row[0]);
+    if (!x) return;
+    const status = String(row[4] || '').trim().toUpperCase();
+    const boundAt = filipinoIsoOrBlank_(row[2]);
+    const lastSeenAt = filipinoIsoOrBlank_(row[3]);
+    const sortKey = boundAt || lastSeenAt || '';
+    const isActive = status === FILIPINO_ACTIVE_;
+    const currentActive = x.bindingStatus === FILIPINO_ACTIVE_;
+    if ((isActive && !currentActive) || (isActive === currentActive && sortKey >= x._bindingSort)) {
+      x.bindingStatus = isActive ? FILIPINO_ACTIVE_ : (status || 'UNBOUND');
+      x.boundAt = boundAt;
+      x.lastSeenAt = lastSeenAt;
+      x._bindingSort = sortKey;
+    }
+  });
+
+  (eventRows || []).forEach(row => {
+    const x = ensure(row[1]);
+    if (!x) return;
+    const eventType = String(row[3] || '').trim().toUpperCase();
+    const occurredAt = filipinoIsoOrBlank_(row[6]);
+    if (eventType === 'ANSWER') {
+      x.answeredQuestions++;
+      if (row[5] === true || String(row[5]).toUpperCase() === 'TRUE') x._correctAnswers++;
+      const day = filipinoPracticeDay_(row[6]);
+      if (day) x._activeDayMap[day] = true;
+    } else if (eventType === 'ROUND_COMPLETE') {
+      x.completedRounds++;
+    }
+    if (occurredAt && occurredAt > x.lastPractice) x.lastPractice = occurredAt;
+  });
+
+  return Object.keys(map).sort().map(id => {
+    const x = map[id];
+    x.activeDays = Object.keys(x._activeDayMap).length;
+    x.correctRate = x.answeredQuestions
+      ? Math.round(x._correctAnswers / x.answeredQuestions * 1000) / 10
+      : null;
+    delete x._correctAnswers;
+    delete x._activeDayMap;
+    delete x._bindingSort;
+    return x;
+  });
+}
+
+function filipinoPracticeDay_(value) {
+  if (!value) return '';
+  const d = value instanceof Date ? value : new Date(value);
+  if (isNaN(d.getTime())) return '';
+  try {
+    return Utilities.formatDate(d, 'Asia/Taipei', 'yyyy-MM-dd');
+  } catch (_) {
+    return d.toISOString().slice(0,10);
+  }
+}
+
+function filipinoIsoOrBlank_(value) {
+  if (!value) return '';
+  const d = value instanceof Date ? value : new Date(value);
+  if (isNaN(d.getTime())) return String(value);
+  return d.toISOString();
+}
+
 function filipinoPracticeEvent_(payload) {
   const eventId = String((payload && payload.eventId) || '').trim();
   const employeeId = filipinoNormalizeEmployeeId_(payload && payload.employeeId);
@@ -199,5 +356,15 @@ Integration into the EXISTING doPost after its JSON payload is parsed:
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+For ADMIN actions, integrate only AFTER the existing admin token/session check has succeeded:
+
+  const practiceAdminResult = handleFilipinoPracticeAdminAction_(payload, true);
+  if (practiceAdminResult !== null) {
+    return ContentService
+      .createTextOutput(JSON.stringify(practiceAdminResult))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+Never pass true before the existing admin authentication succeeds.
 Do not replace the existing doPost or deployment ID.
 */
