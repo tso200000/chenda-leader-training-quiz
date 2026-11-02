@@ -31,7 +31,7 @@ test('總會考會把 FINAL40 成績送進既有 Apps Script 後端', () => {
   assert.match(html, /total:\s*COUNT/);
   assert.match(html, /(?:answers\s*:|\banswers\s*,)/);
   assert.match(html, /(?:startedAt\s*:|\bstartedAt\s*,)/);
-  assert.match(html, /(?:finishedAt\s*:|\bfinishedAt\s*,)/);
+  assert.match(html, /(?:finishedAt\s*:|\bfinishedAt\s*[,}])/);
   assert.match(html, /resultCloud/);
 });
 
