@@ -57,3 +57,17 @@ test('caches and clears display identity only', () => {
   assert.equal(api.getCurrentIdentity(), null);
   assert.equal(api.getDeviceToken(), token);
 });
+
+
+test('Apps Script POST stays a simple text/plain request to avoid browser preflight', async () => {
+  let options = null;
+  const storage = makeStorage();
+  const { createPracticeIdentity } = require('../filipino-practice-identity.js');
+  const api = createPracticeIdentity({
+    storage,
+    cryptoObj:{randomUUID:()=> 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee'},
+    fetchFn:async (_url,opts)=>{ options=opts; return {ok:true,json:async()=>({ok:false})}; }
+  });
+  await api.lookupEmployee('3017');
+  assert.equal(options.headers['Content-Type'],'text/plain;charset=utf-8');
+});
