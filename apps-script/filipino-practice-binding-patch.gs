@@ -174,6 +174,7 @@ function filipinoIsoOrBlank_(value) {
 function filipinoPracticeEvent_(payload) {
   const eventId = String((payload && payload.eventId) || '').trim();
   const employeeId = filipinoNormalizeEmployeeId_(payload && payload.employeeId);
+  const deviceToken = String((payload && payload.deviceToken) || '').trim();
   const courseId = String((payload && payload.courseId) || '').trim();
   const eventType = String((payload && payload.eventType) || '').trim().toUpperCase();
   const questionNo = payload && payload.questionNo !== undefined && payload.questionNo !== null ? payload.questionNo : '';
@@ -181,7 +182,7 @@ function filipinoPracticeEvent_(payload) {
   const occurredAt = String((payload && payload.occurredAt) || '').trim() || new Date().toISOString();
   const practiceRoundId = String((payload && payload.practiceRoundId) || '').trim();
 
-  if (!eventId || !employeeId || !courseId || !practiceRoundId) {
+  if (!eventId || !employeeId || !deviceToken || !courseId || !practiceRoundId) {
     return filipinoPracticeError_('INVALID_PRACTICE_EVENT');
   }
   if (eventType !== 'ANSWER' && eventType !== 'ROUND_COMPLETE') {
@@ -195,8 +196,25 @@ function filipinoPracticeEvent_(payload) {
   lock.waitLock(10000);
   try {
     const ss = SpreadsheetApp.openById(FILIPINO_PRACTICE_SPREADSHEET_ID_);
+    const bindingSheet = ss.getSheetByName(FILIPINO_BINDING_SHEET_);
     const sheet = ss.getSheetByName(FILIPINO_EVENTS_SHEET_);
+    if (!bindingSheet) throw new Error('Missing sheet: ' + FILIPINO_BINDING_SHEET_);
     if (!sheet) throw new Error('Missing sheet: ' + FILIPINO_EVENTS_SHEET_);
+
+    const bindingLastRow = bindingSheet.getLastRow();
+    const bindingRows = bindingLastRow > 1
+      ? bindingSheet.getRange(2, 1, bindingLastRow - 1, 7).getValues()
+      : [];
+    let activeBindingMatched = false;
+    for (let i = 0; i < bindingRows.length; i++) {
+      const rowEmployeeId = filipinoNormalizeEmployeeId_(bindingRows[i][0]);
+      const rowDeviceToken = String(bindingRows[i][1] || '').trim();
+      const rowStatus = String(bindingRows[i][4] || '').trim().toUpperCase();
+      if (rowEmployeeId !== employeeId || rowDeviceToken !== deviceToken || rowStatus !== FILIPINO_ACTIVE_) continue;
+      activeBindingMatched = true;
+      break;
+    }
+    if (!activeBindingMatched) return filipinoPracticeError_('INVALID_PRACTICE_DEVICE');
 
     const lastRow = sheet.getLastRow();
     if (lastRow > 1) {
