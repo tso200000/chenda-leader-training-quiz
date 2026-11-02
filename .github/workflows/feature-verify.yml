@@ -1,0 +1,20 @@
+name: Feature branch verification
+
+on:
+  push:
+    branches:
+      - feat/filipino-practice-identity
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node tests
+        run: node --test tests/*.test.js
+      - name: Apps Script patch syntax
+        run: node --check apps-script/filipino-practice-binding-patch.gs
