@@ -24,12 +24,14 @@ test('總會考會把 FINAL40 成績送進既有 Apps Script 後端', () => {
   const html = fs.readFileSync(path.join(root, 'leader-final-exam.html'), 'utf8');
   assert.match(html, /courseId:\s*['"]FINAL40['"]/);
   assert.match(html, /course:\s*['"]總會考｜1～8堂綜合測驗['"]/);
-  assert.match(html, /score:/);
-  assert.match(html, /correct:/);
+  assert.match(html, /const\s+score\s*=\s*correct\s*\*\s*2\.5/);
+  assert.match(html, /const\s+payload\s*=\s*\{/);
+  assert.match(html, /(?:score\s*:|\bscore\s*,)/);
+  assert.match(html, /(?:correct\s*:|\bcorrect\s*,)/);
   assert.match(html, /total:\s*COUNT/);
-  assert.match(html, /answers:/);
-  assert.match(html, /startedAt:/);
-  assert.match(html, /finishedAt:/);
+  assert.match(html, /(?:answers\s*:|\banswers\s*,)/);
+  assert.match(html, /(?:startedAt\s*:|\bstartedAt\s*,)/);
+  assert.match(html, /(?:finishedAt\s*:|\bfinishedAt\s*,)/);
   assert.match(html, /resultCloud/);
 });
 
@@ -46,7 +48,8 @@ test('總會考選項順序固定並與紙本一致，不再隨機洗牌', () =>
   assert.doesNotMatch(html, /function\s+shuffledIndexes/);
   assert.doesNotMatch(html, /Math\.random\(\)/);
   assert.match(html, /答案選項順序固定/);
-  assert.match(html, /orderMaps\s*=\s*QUESTIONS\.map\(q=>Array\.from\(\{length:q\.c\.length\},\(_,i\)=>i\)\)/);
+  assert.match(html, /function\s+fixedOrderMaps\(\)\s*\{[\s\S]*QUESTIONS\.map\(q=>Array\.from\(\{length:q\.c\.length\},\(_,i\)=>i\)\)[\s\S]*\}/);
+  assert.match(html, /orderMaps\s*=\s*fixedOrderMaps\(\)/);
 });
 
 
