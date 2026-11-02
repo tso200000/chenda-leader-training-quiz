@@ -33,7 +33,7 @@
     async function post(payload){
       const response = await fetchFn(apiUrl, {
         method:'POST',
-        headers:{'Content-Type':'application/json'},
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
         body:JSON.stringify(payload)
       });
       return response.json();
