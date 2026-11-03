@@ -214,11 +214,29 @@ window.__PRACTICE_POC_LOCKED__ = true;
   setStatus('Verifying device…｜正在驗證裝置…');
   google.script.run.withSuccessHandler(result => {
     if (!result || !result.ok) {setStatus('Device not authorized｜裝置未授權'); return;}
-    roundId = uid();
-    window.__PRACTICE_POC_LOCKED__ = false;
-    document.getElementById('questionView').hidden = false;
-    setStatus('Device verified｜裝置驗證成功');
-    render();
+    setStatus('Loading saved progress…｜正在讀取已儲存進度…');
+    google.script.run.withSuccessHandler(progress => {
+      if (!progress || !progress.ok) {setStatus('Unable to restore progress｜無法恢復進度');return;}
+      roundId = progress.hasProgress ? progress.practiceRoundId : uid();
+      index = progress.hasProgress ? Math.max(0, Math.min(59, progress.nextQuestion - 1)) : 0;
+      correct = progress.correctCount || 0;
+      locked = false; pending = null; saving = false;
+      window.__PRACTICE_POC_LOCKED__ = false;
+      if (progress.finished) {
+        document.getElementById('questionView').hidden = true;
+        finishView.hidden = false;
+        progressText.textContent = '60 / 60';
+        progressBar.style.width = '100%';
+        correctText.textContent = correct;
+        finalScore.textContent = 'Correct: ' + correct + ' / 60｜答對：' + correct + ' / 60';
+      } else {
+        finishView.hidden = true;
+        document.getElementById('questionView').hidden = false;
+        render();
+      }
+      setStatus('Progress restored｜進度已恢復');
+    }).withFailureHandler(() => setStatus('Resume failed｜讀取進度失敗'))
+      .filipinoCourse1ResumeBridge(employeeId,deviceToken);
   }).withFailureHandler(() => setStatus('Verification failed｜裝置驗證失敗'))
     .filipinoCourse1VerifyBridge(employeeId,deviceToken);
 })();
