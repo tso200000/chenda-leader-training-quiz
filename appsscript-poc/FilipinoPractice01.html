@@ -102,16 +102,18 @@ window.__PRACTICE_POC_LOCKED__ = true;
   const restartButton = document.getElementById('restartButton');
   const letters = ['A','B','C','D'];
   let index = 0, correct = 0, locked = false;
-  let employeeId = '', deviceToken = '', roundId = '', pending = null;
+  let employeeId = '', deviceToken = '', roundId = '', pending = null, saving = false;
   const notice = document.createElement('p');
   notice.id = 'practiceSyncStatus';
   document.getElementById('practiceCard').prepend(notice);
   function uid(){ return crypto.randomUUID(); }
   function setStatus(text){ notice.textContent = text; }
   function saveAnswer() {
-    if (!pending) return;
+    if (!pending || saving) return;
+    saving = true;
     setStatus('Saving answer…｜正在儲存答題紀錄…');
     google.script.run.withSuccessHandler(result => {
+      saving = false;
       if (!result || !result.ok) {
         setStatus('Save failed. Please retry.｜儲存失敗，請重試。');
         nextButton.textContent = 'Retry Save｜重試儲存';
@@ -123,6 +125,7 @@ window.__PRACTICE_POC_LOCKED__ = true;
       nextButton.textContent = index === questions.length - 1 ? 'See Result｜查看結果' : 'Next Question｜下一題';
       nextButton.hidden = false;
     }).withFailureHandler(() => {
+      saving = false;
       setStatus('Connection failed. Retry save.｜連線失敗，請重試儲存。');
       nextButton.textContent = 'Retry Save｜重試儲存';
       nextButton.hidden = false;
@@ -196,7 +199,7 @@ window.__PRACTICE_POC_LOCKED__ = true;
 
   nextButton.addEventListener('click', next);
   restartButton.addEventListener('click', () => {
-    index = 0; correct = 0; locked = false;
+    index = 0; correct = 0; locked = false; pending = null; saving = false; roundId = uid();
     finishView.hidden = true; questionView.hidden = false;
     render(); window.scrollTo({top:0,behavior:'smooth'});
   });
