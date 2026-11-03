@@ -102,6 +102,32 @@ window.__PRACTICE_POC_LOCKED__ = true;
   const restartButton = document.getElementById('restartButton');
   const letters = ['A','B','C','D'];
   let index = 0, correct = 0, locked = false;
+  let employeeId = '', deviceToken = '', roundId = '', pending = null;
+  const notice = document.createElement('p');
+  notice.id = 'practiceSyncStatus';
+  document.getElementById('practiceCard').prepend(notice);
+  function uid(){ return crypto.randomUUID(); }
+  function setStatus(text){ notice.textContent = text; }
+  function saveAnswer() {
+    if (!pending) return;
+    setStatus('Saving answer…｜正在儲存答題紀錄…');
+    google.script.run.withSuccessHandler(result => {
+      if (!result || !result.ok) {
+        setStatus('Save failed. Please retry.｜儲存失敗，請重試。');
+        nextButton.textContent = 'Retry Save｜重試儲存';
+        nextButton.hidden = false;
+        return;
+      }
+      pending = null;
+      setStatus('Answer saved｜答題紀錄已儲存');
+      nextButton.textContent = index === questions.length - 1 ? 'See Result｜查看結果' : 'Next Question｜下一題';
+      nextButton.hidden = false;
+    }).withFailureHandler(() => {
+      setStatus('Connection failed. Retry save.｜連線失敗，請重試儲存。');
+      nextButton.textContent = 'Retry Save｜重試儲存';
+      nextButton.hidden = false;
+    }).filipinoCourse1EventBridge(pending);
+  }
 
   function render() {
     if (!questions.length) {
@@ -148,11 +174,12 @@ window.__PRACTICE_POC_LOCKED__ = true;
       feedback.className = 'feedback show bad';
       feedback.innerHTML = '<div class="feedback-title">✕ Not quite｜答錯了</div><div class="answer-line">Correct Answer｜正確答案：' + letters[answer] + '. ' + q[3][answer][0] + '<span class="zh">' + q[3][answer][1] + '</span></div><div class="why"><strong>Why｜為什麼？</strong><br>' + q[5] + '<span class="zh">' + q[6] + '</span></div>';
     }
-    nextButton.textContent = index === questions.length - 1 ? 'See Result｜查看結果' : 'Next Question｜下一題';
-    nextButton.hidden = false;
+    pending = {employeeId,deviceToken,practiceRoundId:roundId,questionNo:q[0],selectedIndex:selected,eventId:uid()};
+    saveAnswer();
   }
 
   function next() {
+    if (pending) { nextButton.hidden = true; saveAnswer(); return; }
     if (!locked) return;
     if (index < questions.length - 1) {
       index++;
@@ -173,14 +200,24 @@ window.__PRACTICE_POC_LOCKED__ = true;
     finishView.hidden = true; questionView.hidden = false;
     render(); window.scrollTo({top:0,behavior:'smooth'});
   });
-  if (window.__PRACTICE_POC_LOCKED__) {
-    document.getElementById('questionView').hidden = true;
-    const notice = document.createElement('p');
-    notice.textContent = 'Integration test pending: device verification and event logging are not connected.｜整合測試尚未完成：裝置驗證及答題紀錄尚未接入。';
-    document.getElementById('practiceCard').prepend(notice);
+  document.getElementById('questionView').hidden = true;
+  const params = new URLSearchParams(location.search);
+  employeeId = (params.get('employeeId') || '').trim();
+  deviceToken = localStorage.getItem('filipino_practice_device_token_v1') || '';
+  if (!employeeId || !deviceToken || !window.google?.script?.run) {
+    setStatus('Please complete registration first.｜請先完成裝置登記。');
     return;
   }
-  render();
+  setStatus('Verifying device…｜正在驗證裝置…');
+  google.script.run.withSuccessHandler(result => {
+    if (!result || !result.ok) {setStatus('Device not authorized｜裝置未授權'); return;}
+    roundId = uid();
+    window.__PRACTICE_POC_LOCKED__ = false;
+    document.getElementById('questionView').hidden = false;
+    setStatus('Device verified｜裝置驗證成功');
+    render();
+  }).withFailureHandler(() => setStatus('Verification failed｜裝置驗證失敗'))
+    .filipinoCourse1VerifyBridge(employeeId,deviceToken);
 })();
 </script>
 </body>
