@@ -17,6 +17,5 @@ function filipinoCourse1EventBridge(p) {
   const selected = Number(p.selectedIndex);
   if (!Number.isInteger(selected) || selected < 0 || selected > 3) return {ok:false,code:'INVALID_CHOICE'};
   const correct = selected === answerKey[questionNo-1];
-  // Write remains disabled pending full event adapter review.
-  return {ok:false,code:'ANSWER_KEY_NOT_CONNECTED'};
+  return filipinoCourse1PersistAnswer_(p, id, token, eventId, roundId, questionNo, correct);
 }
