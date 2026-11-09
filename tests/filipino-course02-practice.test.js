@@ -7,7 +7,7 @@ vm.runInNewContext(data,ctx);
 const q = ctx.window.COURSE2_PRACTICE;
 assert.equal(q.length,60);
 assert.equal(new Set(q.map(row=>row[1])).size,60);
-assert.deepEqual(q.map(row=>row[0]),Array.from({length:60},(_,i)=>i+1));
+assert.equal(JSON.stringify(q.map(row=>row[0])),JSON.stringify(Array.from({length:60},(_,i)=>i+1)));
 for (const row of q) {
   assert.equal(row.length,7);
   assert.equal(row[3].length,4);
