@@ -42,7 +42,6 @@ async function load(){
       return;
     }
     if(!response.ok||!data.ok||!Array.isArray(data.rows))throw Error('LOAD_FAILED');
-    const bindings={ACTIVE:'已綁定',RELEASED:'已解除',UNBOUND:'未綁定'};
     const courseNames=['第一堂｜幹部與工作安排','第二堂｜現場工作安排流程與改善','第三堂｜帶人與新人教導','第四堂｜品質意識','第五堂｜現場紀律與 5S 安全管理','第六堂｜報表填寫與開會習慣'];
     const fragment=document.createDocumentFragment();
     const bindings={ACTIVE:'已綁定',RELEASED:'已解除',UNBOUND:'未綁定'};
