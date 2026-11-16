@@ -20,21 +20,26 @@
 </main>
 <script>
 const API='https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec';
-const status=document.getElementById('status');
+const statusEl=document.getElementById('status');
 const courseSections=document.getElementById('courseSections');
 const results=document.getElementById('results');
 function returnToLogin(){
-  status.textContent='請先從測驗管理中心登入管理員帳號，再開啟這個頁面。';
+  statusEl.textContent='請先從測驗管理中心登入管理員帳號，再開啟這個頁面。';
 }
 async function load(){
   try{
     const token=sessionStorage.getItem('chendaAdminToken');
     if(!token){returnToLogin();return;}
-    const response=await fetch(API,{
+    statusEl.textContent='正在讀取練習統計資料…';
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),15000);
+    let response;
+    try{response=await fetch(API,{
       method:'POST',
       headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify({action:'adminCandidatePracticeStats',token})
-    });
+      body:JSON.stringify({action:'adminCandidatePracticeStats',token}),
+      signal:controller.signal
+    });}finally{clearTimeout(timeout);}
     const data=await response.json();
     if(data.code==='ADMIN_SESSION_EXPIRED'){
       sessionStorage.removeItem('chendaAdminToken');
@@ -78,18 +83,13 @@ async function load(){
       fragment.appendChild(section);
     }
     courseSections.replaceChildren(fragment);
-    status.textContent='正式考生共 '+data.rows.length+' 位';
+    statusEl.textContent='正式考生共 '+data.rows.length+' 位';
     results.hidden=false;
-  }catch(_){
-    status.textContent='無法讀取練習統計，請重新整理再試。';
+  }catch(error){
+    statusEl.textContent=error.name==='AbortError'?'讀取逾時，請返回管理中心重新登入後再試。':'無法讀取練習統計，請返回管理中心重新登入後再試。';
   }
 }
 load();
-window.addEventListener('pagehide',()=>{
-  courseSections.replaceChildren();
-  results.hidden=true;
-  status.textContent='正在確認管理員權限…';
-});
 window.addEventListener('pageshow',event=>{if(event.persisted)load();});
 </script>
 </body>
