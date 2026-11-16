@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>晨達｜考生練習統計</title>
 <style>
-*{box-sizing:border-box}body{margin:0;border-top:14px solid #1f3e63;background:#f4f7fa;color:#1f2937;font:16px/1.5 "Microsoft JhengHei",system-ui,sans-serif}main{max-width:1320px;margin:auto;padding:24px}h1{margin:14px 0 4px;color:#1f3e63}a{color:#1f3e63}p{margin:8px 0 16px}.table-wrap{overflow:auto;border:1px solid #dbe3ec;border-radius:12px;background:white}table{width:100%;border-collapse:collapse;white-space:nowrap;font-variant-numeric:tabular-nums}th,td{padding:10px 12px;text-align:center;border-bottom:1px solid #dbe3ec}thead th{background:#edf3f9;color:#1f3e63}tbody th{font-weight:600}tbody tr:nth-child(even){background:#f8fafc}tr:last-child td,tr:last-child th{border-bottom:0}thead tr:first-child th{border-bottom:1px solid #dbe3ec}th[scope=row],td:nth-child(2){text-align:left}[hidden]{display:none!important}@media(max-width:640px){main{padding:16px}}
+*{box-sizing:border-box}body{margin:0;border-top:14px solid #1f3e63;background:#f4f7fa;color:#1f2937;font:16px/1.5 "Microsoft JhengHei",system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:24px}h1{margin:14px 0 4px;color:#1f3e63}a{color:#1f3e63}p{margin:8px 0 16px}.table-wrap{overflow:auto;border:1px solid #dbe3ec;border-radius:12px;background:white}table{width:100%;border-collapse:collapse;white-space:nowrap;font-variant-numeric:tabular-nums}th,td{padding:10px 12px;text-align:center;border-bottom:1px solid #dbe3ec}thead th{background:#edf3f9;color:#1f3e63}tbody th{font-weight:600}tbody tr:nth-child(even){background:#f8fafc}tr:last-child td,tr:last-child th{border-bottom:0}thead tr:first-child th{border-bottom:1px solid #dbe3ec}th[scope=row],td:nth-child(2){text-align:left}.course-section{margin:22px 0 28px}.course-section h2{font-size:21px;color:#1f3e63;margin:0 0 10px}.course-note{font-size:14px;color:#64748b;margin:0 0 9px}.course-section.is-pending{background:#fff;border:1px solid #dbe3ec;border-radius:12px;padding:15px 18px}.course-section.is-pending h2{margin:0 0 4px}.course-section.is-pending p{margin:0;color:#64748b}[hidden]{display:none!important}@media(max-width:640px){main{padding:16px}}
 </style>
 </head>
 <body>
@@ -15,22 +15,13 @@
 <p id="status" role="status">正在確認管理員權限…</p>
 <div id="results" hidden>
 <p>輪次顯示「已練習／已完成」。作答題數包含各輪作答，不重複題數按每堂題號計算。</p>
-<div class="table-wrap" tabindex="0" role="region" aria-label="考生練習統計資料表">
-<table aria-label="各考生第一堂與第二堂練習統計">
-<colgroup span="3"></colgroup><colgroup span="5"></colgroup><colgroup span="5"></colgroup>
-<thead>
-<tr><th rowspan="2" scope="col">工號</th><th rowspan="2" scope="col">英文姓名</th><th rowspan="2" scope="col">綁定狀態</th><th colspan="5" scope="colgroup">第一堂</th><th colspan="5" scope="colgroup">第二堂</th></tr>
-<tr><th scope="col">輪次</th><th scope="col">作答</th><th scope="col">答對</th><th scope="col">正確率</th><th scope="col">不重複題數</th><th scope="col">輪次</th><th scope="col">作答</th><th scope="col">答對</th><th scope="col">正確率</th><th scope="col">不重複題數</th></tr>
-</thead>
-<tbody id="rows"></tbody>
-</table>
-</div>
+<div id="courseSections"></div>
 </div>
 </main>
 <script>
 const API='https://script.google.com/macros/s/AKfycbxlvoVmUVJCmrrG6_gFWc5Nl3N_sBG0Wjnu1xnn4CtLnBt0kQI_mq5LPuKepMSSCE0E/exec';
 const status=document.getElementById('status');
-const rows=document.getElementById('rows');
+const courseSections=document.getElementById('courseSections');
 const results=document.getElementById('results');
 function returnToLogin(){
   status.textContent='請先從測驗管理中心登入管理員帳號，再開啟這個頁面。';
@@ -52,22 +43,42 @@ async function load(){
     }
     if(!response.ok||!data.ok||!Array.isArray(data.rows))throw Error('LOAD_FAILED');
     const bindings={ACTIVE:'已綁定',RELEASED:'已解除',UNBOUND:'未綁定'};
+    const courseNames=['第一堂｜幹部與工作安排','第二堂｜現場工作安排流程與改善','第三堂｜帶人與新人教導','第四堂｜品質意識','第五堂｜現場紀律與 5S 安全管理','第六堂｜報表填寫與開會習慣'];
     const fragment=document.createDocumentFragment();
-    for(const employee of data.rows){
-      const tr=document.createElement('tr');
-      const id=document.createElement('th');
-      id.scope='row';
-      id.textContent=employee.employeeId;
-      tr.appendChild(id);
-      const cells=[employee.englishName||'—',bindings[employee.bindingStatus]||'—'];
-      for(const course of employee.courses){
-        cells.push(course.rounds+'／'+course.completedRounds,course.answered,course.correct,
-          course.correctRate===null?'—':course.correctRate+'%',course.uniqueQuestions);
+    const bindings={ACTIVE:'已綁定',RELEASED:'已解除',UNBOUND:'未綁定'};
+    for(let index=0;index<courseNames.length;index++){
+      const section=document.createElement('section');
+      section.className='course-section';
+      const heading=document.createElement('h2');
+      heading.textContent=courseNames[index];
+      section.appendChild(heading);
+      if(index>=2){
+        section.classList.add('is-pending');
+        const note=document.createElement('p');
+        note.textContent='尚未開放，待課程上線後顯示練習統計。';
+        section.appendChild(note);
+      }else{
+        if(index===1){const note=document.createElement('p');note.className='course-note';note.textContent='第二堂習題庫目前暫停開放；既有練習紀錄保留。';section.appendChild(note);}
+        const wrap=document.createElement('div');wrap.className='table-wrap';wrap.tabIndex=0;wrap.setAttribute('role','region');wrap.setAttribute('aria-label',courseNames[index]+'考生練習統計');
+        const table=document.createElement('table');
+        const head=document.createElement('thead');
+        const headRow=document.createElement('tr');
+        for(const title of ['工號','英文姓名','綁定狀態','輪次','作答','答對','正確率','不重複題數']){const th=document.createElement('th');th.scope='col';th.textContent=title;headRow.appendChild(th);}
+        head.appendChild(headRow);table.appendChild(head);
+        const body=document.createElement('tbody');
+        for(const employee of data.rows){
+          const course=Array.isArray(employee.courses)?employee.courses[index]:null;
+          const tr=document.createElement('tr');
+          const id=document.createElement('th');id.scope='row';id.textContent=employee.employeeId;tr.appendChild(id);
+          const values=[employee.englishName||'—',bindings[employee.bindingStatus]||'—',course?course.rounds+'／'+course.completedRounds:'0／0',course?course.answered:0,course?course.correct:0,course&&course.correctRate!==null?course.correctRate+'%':'—',course?course.uniqueQuestions:0];
+          for(const value of values)tr.insertCell().textContent=value;
+          body.appendChild(tr);
+        }
+        table.appendChild(body);wrap.appendChild(table);section.appendChild(wrap);
       }
-      for(const value of cells)tr.insertCell().textContent=value;
-      fragment.appendChild(tr);
+      fragment.appendChild(section);
     }
-    rows.replaceChildren(fragment);
+    courseSections.replaceChildren(fragment);
     status.textContent='正式考生共 '+data.rows.length+' 位';
     results.hidden=false;
   }catch(_){
@@ -76,7 +87,7 @@ async function load(){
 }
 load();
 window.addEventListener('pagehide',()=>{
-  rows.replaceChildren();
+  courseSections.replaceChildren();
   results.hidden=true;
   status.textContent='正在確認管理員權限…';
 });
