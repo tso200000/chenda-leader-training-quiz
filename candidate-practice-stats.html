@@ -14,7 +14,7 @@
 <h1>考生練習統計</h1>
 <p id="status" role="status">正在確認管理員權限…</p>
 <div id="results" hidden>
-<p>輪次顯示「已練習／已完成」。作答題數包含各輪作答，不重複題數按每堂題號計算。</p>
+<p>練習次數為開始練習的次數，完成次數為完成整輪的次數；作答題數包含各輪作答，不重複題數按每堂題號計算。</p>
 <div id="courseSections"></div>
 </div>
 </main>
@@ -67,14 +67,14 @@ async function load(){
         const table=document.createElement('table');
         const head=document.createElement('thead');
         const headRow=document.createElement('tr');
-        for(const title of ['工號','英文姓名','綁定狀態','輪次','作答','答對','正確率','不重複題數']){const th=document.createElement('th');th.scope='col';th.textContent=title;headRow.appendChild(th);}
+        for(const title of ['工號','英文姓名','綁定狀態','練習次數','完成次數','作答','答對','正確率','不重複題數']){const th=document.createElement('th');th.scope='col';th.textContent=title;headRow.appendChild(th);}
         head.appendChild(headRow);table.appendChild(head);
         const body=document.createElement('tbody');
         for(const employee of data.rows){
           const course=Array.isArray(employee.courses)?employee.courses[index]:null;
           const tr=document.createElement('tr');
           const id=document.createElement('th');id.scope='row';id.textContent=employee.employeeId;tr.appendChild(id);
-          const values=[employee.englishName||'—',bindings[employee.bindingStatus]||'—',course?course.rounds+'／'+course.completedRounds:'0／0',course?course.answered:0,course?course.correct:0,course&&course.correctRate!==null?course.correctRate+'%':'—',course?course.uniqueQuestions:0];
+          const values=[employee.englishName||'—',bindings[employee.bindingStatus]||'—',course?course.rounds:0,course?course.completedRounds:0,course?course.answered:0,course?course.correct:0,course&&course.correctRate!==null?course.correctRate+'%':'—',course?course.uniqueQuestions:0];
           for(const value of values)tr.insertCell().textContent=value;
           body.appendChild(tr);
         }
