@@ -10,6 +10,12 @@ function showDetail(r){
  if(questions.length!==25){const note=document.createElement('p');note.className='wide';note.textContent=r.detailMessage||'歷史逐題資料不足';root.append(note)}
  else{
   const summary=document.createElement('p');summary.className='wide';summary.textContent='答對 '+r.detailSummary.correct+' 題｜答錯 '+r.detailSummary.incorrect+' 題｜未作答 '+r.detailSummary.unanswered+' 題';root.append(summary);
+  const controls=document.createElement('label');controls.className='wide';controls.textContent='逐題顯示範圍：';
+  const filter=document.createElement('select');filter.setAttribute('aria-label','逐題顯示範圍');
+  for(const [value,text] of [['all','全部 25 題'],['incorrect','只看答錯'],['unanswered','只看未作答']]){const option=document.createElement('option');option.value=value;option.textContent=text;filter.append(option)}
+  controls.append(filter);root.append(controls);
+  const empty=document.createElement('p');empty.className='wide';empty.hidden=true;root.append(empty);
+  const cards=[];
   questions.forEach(q=>{
    const item=document.createElement('section');item.className='wide question-result '+q.status;
    const title=document.createElement('h4');title.textContent='第 '+q.displayOrder+' 題｜原始題號 Q'+String(q.questionNo).padStart(2,'0')+'｜'+({correct:'答對｜Correct',incorrect:'答錯｜Incorrect',unanswered:'未作答｜Not answered'}[q.status]);item.append(title);
@@ -21,8 +27,9 @@ function showDetail(r){
     else{const english=document.createElement('span'),chinese=document.createElement('span');english.textContent=['A','B','C','D'][index]+'. '+q.options[index][0];chinese.className='zh';chinese.textContent=q.options[index][1];line.append(english,chinese)}
     block.append(line);item.append(block);
    }
-   root.append(item);
+   cards.push({item,status:q.status});root.append(item);
   });
+  filter.onchange=()=>{let visible=0;for(const card of cards){card.item.hidden=filter.value!=='all'&&card.status!==filter.value;if(!card.item.hidden)visible++}empty.hidden=visible>0;empty.textContent=filter.value==='incorrect'?'這份考卷沒有答錯的題目。':'這份考卷沒有未作答的題目。';};
  }
  E('details').hidden=false;
 }
