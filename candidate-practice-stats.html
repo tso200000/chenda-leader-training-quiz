@@ -67,14 +67,14 @@ async function load(){
         const table=document.createElement('table');
         const head=document.createElement('thead');
         const headRow=document.createElement('tr');
-        for(const title of ['工號','英文姓名','綁定狀態','練習次數','完成次數','作答','答對','正確率','不重複題數']){const th=document.createElement('th');th.scope='col';th.textContent=title;headRow.appendChild(th);}
+        for(const title of ['工號','中文姓名','綁定狀態','練習次數','完成次數','作答','答對','正確率','不重複題數']){const th=document.createElement('th');th.scope='col';th.textContent=title;headRow.appendChild(th);}
         head.appendChild(headRow);table.appendChild(head);
         const body=document.createElement('tbody');
         for(const employee of data.rows){
           const course=Array.isArray(employee.courses)?employee.courses[index]:null;
           const tr=document.createElement('tr');
           const id=document.createElement('th');id.scope='row';id.textContent=employee.employeeId;tr.appendChild(id);
-          const values=[employee.englishName||'—',bindings[employee.bindingStatus]||'—',course?course.rounds:0,course?course.completedRounds:0,course?course.answered:0,course?course.correct:0,course&&course.correctRate!==null?course.correctRate+'%':'—',course?course.uniqueQuestions:0];
+          const values=[employee.chineseName||'—',bindings[employee.bindingStatus]||'—',course?course.rounds:0,course?course.completedRounds:0,course?course.answered:0,course?course.correct:0,course&&course.correctRate!==null?course.correctRate+'%':'—',course?course.uniqueQuestions:0];
           for(const value of values)tr.insertCell().textContent=value;
           body.appendChild(tr);
         }
